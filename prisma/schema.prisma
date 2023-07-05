@@ -26,6 +26,7 @@ model User {
     updatedBy       Int?
     updatedAt       DateTime  @updatedAt
     metadata        Json?
+    Order           Order[]
 }
 
 model Avatar {
@@ -80,6 +81,7 @@ model Address {
     createdAt     DateTime  @default(now())
     updatedBy     Int?
     updatedAt     DateTime  @updatedAt
+    Order         Order[]
 }
 
 model Cart {
@@ -137,8 +139,15 @@ model Category {
 model Product {
     id          Int              @id @default(autoincrement())
     name        String
+    code        String
     description String
+    importPrice Float?
     price       Float
+    tax         Float?
+    discount    Float?
+    new         Boolean?
+    hot         Boolean?
+    status      ProductStatus    @default(AVAILABLE)
     categoryId  Int
     category    Category         @relation(fields: [categoryId], references: [id])
     variants    ProductVariant[]
@@ -152,51 +161,73 @@ model Product {
     updatedBy   Int?
     updatedAt   DateTime         @updatedAt
     metadata    Json?
+    OrderItem   OrderItem[]
 }
 
 model Color {
-    id         Int              @id @default(autoincrement())
-    name       String
-    variants   ProductVariant[]
-    metadata   Json?
-    deletedFlg Boolean          @default(false)
-    deletedAt  DateTime?
-    createdBy  Int?
-    createdAt  DateTime         @default(now())
-    updatedBy  Int?
-    updatedAt  DateTime         @updatedAt
+    id          Int              @id @default(autoincrement())
+    name        String
+    description String?
+    image       String?
+    variants    ProductVariant[]
+    metadata    Json?
+    deletedFlg  Boolean          @default(false)
+    deletedAt   DateTime?
+    createdBy   Int?
+    createdAt   DateTime         @default(now())
+    updatedBy   Int?
+    updatedAt   DateTime         @updatedAt
 }
 
 model Size {
-    id         Int              @id @default(autoincrement())
-    name       String
-    variants   ProductVariant[]
-    metadata   Json?
-    deletedFlg Boolean          @default(false)
-    deletedAt  DateTime?
-    createdBy  Int?
-    createdAt  DateTime         @default(now())
-    updatedBy  Int?
-    updatedAt  DateTime         @updatedAt
+    id          Int              @id @default(autoincrement())
+    name        String
+    description String?
+    variants    ProductVariant[]
+    metadata    Json?
+    deletedFlg  Boolean          @default(false)
+    deletedAt   DateTime?
+    createdBy   Int?
+    createdAt   DateTime         @default(now())
+    updatedBy   Int?
+    updatedAt   DateTime         @updatedAt
+}
+
+model Material {
+    id          Int              @id @default(autoincrement())
+    name        String
+    description String?
+    image       String?
+    variants    ProductVariant[]
+    metadata    Json?
+    deletedFlg  Boolean          @default(false)
+    deletedAt   DateTime?
+    createdBy   Int?
+    createdAt   DateTime         @default(now())
+    updatedBy   Int?
+    updatedAt   DateTime         @updatedAt
 }
 
 model ProductVariant {
-    id         Int        @id @default(autoincrement())
+    id         Int         @id @default(autoincrement())
     productId  Int
     colorId    Int
     sizeId     Int
     stock      Int
-    product    Product    @relation(fields: [productId], references: [id])
-    color      Color      @relation(fields: [colorId], references: [id])
-    size       Size       @relation(fields: [sizeId], references: [id])
+    product    Product     @relation(fields: [productId], references: [id])
+    color      Color       @relation(fields: [colorId], references: [id])
+    size       Size        @relation(fields: [sizeId], references: [id])
     CartItem   CartItem[]
     metadata   Json?
-    deletedFlg Boolean    @default(false)
+    deletedFlg Boolean     @default(false)
     deletedAt  DateTime?
     createdBy  Int?
-    createdAt  DateTime   @default(now())
+    createdAt  DateTime    @default(now())
     updatedBy  Int?
-    updatedAt  DateTime   @updatedAt
+    updatedAt  DateTime    @updatedAt
+    Material   Material?   @relation(fields: [materialId], references: [id])
+    materialId Int?
+    OrderItem  OrderItem[]
 }
 
 model ProductImage {
@@ -213,6 +244,60 @@ model ProductImage {
     updatedAt  DateTime  @updatedAt
 }
 
+model Order {
+    id              Int         @id @default(autoincrement())
+    orderNumber     String      @unique
+    customerId      Int
+    customer        User        @relation(fields: [customerId], references: [id])
+    orderDate       DateTime    @default(now())
+    shippingAddress Address     @relation(fields: [addressId], references: [id])
+    items           OrderItem[]
+    subtotal        Float
+    tax             Float
+    discount        Float
+    total           Float
+    addressId       Int
+    phoneRecipient  String
+    phoneDeliver    String?
+    status
+    metadata        Json?
+    deletedFlg      Boolean     @default(false)
+    deletedAt       DateTime?
+    createdBy       Int?
+    createdAt       DateTime    @default(now())
+    updatedBy       Int?
+    updatedAt       DateTime    @updatedAt
+    Voucher         Voucher?    @relation(fields: [voucherId], references: [id])
+    voucherId       Int?
+}
+
+model Voucher {
+    id        Int       @id @default(autoincrement())
+    code      String    @unique
+    discount  Float
+    validFrom DateTime?
+    validTo   DateTime?
+    orders    Order[]
+}
+
+model OrderItem {
+    id         Int            @id @default(autoincrement())
+    orderId    Int
+    productId  Int
+    variantId  Int
+    quantity   Int
+    order      Order          @relation(fields: [orderId], references: [id])
+    product    Product        @relation(fields: [productId], references: [id])
+    variant    ProductVariant @relation(fields: [variantId], references: [id])
+    metadata   Json?
+    deletedFlg Boolean        @default(false)
+    deletedAt  DateTime?
+    createdBy  Int?
+    createdAt  DateTime       @default(now())
+    updatedBy  Int?
+    updatedAt  DateTime       @updatedAt
+}
+
 enum UserType {
     CUSTOMER
     ADMIN
@@ -223,4 +308,20 @@ enum Gender {
     FEMALE
     NONBINARY
     UNKNOWN
+}
+
+enum ProductStatus {
+    INSTOCK
+    AVAILABLE
+    SOLD_OUT
+}
+
+enum OrderStatus {
+    WAITING
+    CONFIRMED
+    SHIPPING
+    COMPLETED
+    REQUIRED_ACTION
+    CANCELED
+    CLOSED
 }
