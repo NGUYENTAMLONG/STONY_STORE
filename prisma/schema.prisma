@@ -18,6 +18,8 @@ model User {
     cart            Cart?
     shippingAddress Address[]
     profile         Profile?
+    isAdministrator Boolean
+    roles           Role[]
     //
     deletedFlg      Boolean   @default(false)
     deletedAt       DateTime?
@@ -27,6 +29,34 @@ model User {
     updatedAt       DateTime  @updatedAt
     metadata        Json?
     Order           Order[]
+}
+
+model Role {
+    id          Int          @id @default(autoincrement())
+    name        String       @unique
+    permissions Permission[]
+    deletedFlg  Boolean      @default(false)
+    deletedAt   DateTime?
+    createdBy   Int?
+    createdAt   DateTime     @default(now())
+    updatedBy   Int?
+    updatedAt   DateTime     @updatedAt
+    metadata    Json?
+    User        User?        @relation(fields: [userId], references: [id])
+    userId      Int?
+}
+
+model Permission {
+    id         Int       @id @default(autoincrement())
+    name       String    @unique
+    roles      Role[]
+    deletedFlg Boolean   @default(false)
+    deletedAt  DateTime?
+    createdBy  Int?
+    createdAt  DateTime  @default(now())
+    updatedBy  Int?
+    updatedAt  DateTime  @updatedAt
+    metadata   Json?
 }
 
 model Avatar {
@@ -140,7 +170,7 @@ model Product {
     id          Int              @id @default(autoincrement())
     name        String
     code        String
-    description String
+    description String //?
     importPrice Float?
     price       Float
     tax         Float?
@@ -167,6 +197,7 @@ model Product {
 model Color {
     id          Int              @id @default(autoincrement())
     name        String
+    nameEN      String?
     description String?
     image       String?
     variants    ProductVariant[]
@@ -213,7 +244,7 @@ model ProductVariant {
     productId  Int
     colorId    Int
     sizeId     Int
-    stock      Int
+    stock      Int?
     product    Product     @relation(fields: [productId], references: [id])
     color      Color       @relation(fields: [colorId], references: [id])
     size       Size        @relation(fields: [sizeId], references: [id])
@@ -259,7 +290,7 @@ model Order {
     addressId       Int
     phoneRecipient  String
     phoneDeliver    String?
-    status
+    status          OrderStatus @default(WAITING)
     metadata        Json?
     deletedFlg      Boolean     @default(false)
     deletedAt       DateTime?
@@ -286,6 +317,7 @@ model OrderItem {
     productId  Int
     variantId  Int
     quantity   Int
+    status     OrderStatus    @default(WAITING)
     order      Order          @relation(fields: [orderId], references: [id])
     product    Product        @relation(fields: [productId], references: [id])
     variant    ProductVariant @relation(fields: [variantId], references: [id])
