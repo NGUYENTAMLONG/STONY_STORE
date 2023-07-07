@@ -11,6 +11,8 @@ import { AuthorizationGuard } from './auth/authorization.guard';
 import { ColorsModule } from './colors/colors.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { OrdersModule } from './orders/orders.module';
+import { CartsModule } from './carts/carts.module';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
@@ -22,6 +24,8 @@ import { join } from 'path';
     AuthModule,
     PermissionsModule,
     ColorsModule,
+    OrdersModule,
+    CartsModule,
   ],
   controllers: [AppController],
   providers: [

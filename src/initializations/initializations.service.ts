@@ -2,7 +2,7 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { config } from 'dotenv';
-import { COLORS } from 'src/configs/contants.config';
+import { COLORS, MATERIALS, SIZES } from 'src/configs/contants.config';
 config();
 
 @Injectable()
@@ -12,6 +12,8 @@ export class InitializationsService implements OnModuleInit {
   async onModuleInit() {
     await this.initialAdmin();
     await this.initialColors();
+    await this.initialSizes();
+    await this.initialMaterials();
   }
 
   private async initialAdmin() {
@@ -63,6 +65,48 @@ export class InitializationsService implements OnModuleInit {
       console.log('❤️💛💚 Initialized Colors Successful !!! 💙💜🖤');
     } catch (error) {
       console.log({ initialColorsError: error });
+      return error;
+    }
+  }
+
+  private async initialSizes() {
+    try {
+      const countExisted = await this.prisma.size.count();
+      if (countExisted === 0) {
+        for (const size of SIZES) {
+          await this.prisma.size.create({
+            data: {
+              name: size.name,
+              description: size.description,
+            },
+          });
+        }
+      }
+      console.log('🐡🐬🐢 Initialized Sizes Successful !!! 🐊😻🐘');
+    } catch (error) {
+      console.log({ initialSizesError: error });
+      return error;
+    }
+  }
+
+  private async initialMaterials() {
+    try {
+      const countExisted = await this.prisma.material.count();
+      if (countExisted === 0) {
+        for (const material of MATERIALS) {
+          await this.prisma.material.create({
+            data: {
+              name: material.name,
+              // nameEN: material.nameEN,
+              image: `${process.env.BASE_URI}:${process.env.PORT}/images/materials/${material.imageName}`,
+              description: material.description,
+            },
+          });
+        }
+      }
+      console.log('🐡🐬🐢 Initialized materials Successful !!! 🐊😻🐘');
+    } catch (error) {
+      console.log({ initialMaterialsError: error });
       return error;
     }
   }

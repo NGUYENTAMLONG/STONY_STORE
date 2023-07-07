@@ -150,7 +150,7 @@ model CartItem {
 model Category {
     id           Int        @id @default(autoincrement())
     name         String
-    description  String?
+    description  String?    @db.Text
     products     Product[]
     parentId     Int
     parent       Category?  @relation("CategoryToParent", fields: [parentId], references: [id])
@@ -170,7 +170,7 @@ model Product {
     id          Int              @id @default(autoincrement())
     name        String
     code        String
-    description String //?
+    description String?          @db.Text
     importPrice Float?
     price       Float
     tax         Float?
@@ -198,7 +198,7 @@ model Color {
     id          Int              @id @default(autoincrement())
     name        String
     nameEN      String?
-    description String?
+    description String?          @db.Text
     image       String?
     variants    ProductVariant[]
     metadata    Json?
@@ -213,7 +213,7 @@ model Color {
 model Size {
     id          Int              @id @default(autoincrement())
     name        String
-    description String?
+    description String?          @db.Text
     variants    ProductVariant[]
     metadata    Json?
     deletedFlg  Boolean          @default(false)
@@ -227,7 +227,7 @@ model Size {
 model Material {
     id          Int              @id @default(autoincrement())
     name        String
-    description String?
+    description String?          @db.Text
     image       String?
     variants    ProductVariant[]
     metadata    Json?

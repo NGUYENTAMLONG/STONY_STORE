@@ -27,4 +27,5 @@ export class CreateProductVariantDto {
   @IsNumber()
   @IsOptional()
   materialId?: number;
+  
 }
