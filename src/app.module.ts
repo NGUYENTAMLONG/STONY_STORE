@@ -15,6 +15,7 @@ import { OrdersModule } from './orders/orders.module';
 import { CartsModule } from './carts/carts.module';
 import { OrderItemsModule } from './order-items/order-items.module';
 import { CartItemsModule } from './cart-items/cart-items.module';
+import { BannersModule } from './banners/banners.module';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
@@ -30,6 +31,7 @@ import { CartItemsModule } from './cart-items/cart-items.module';
     CartsModule,
     OrderItemsModule,
     CartItemsModule,
+    BannersModule,
   ],
   controllers: [AppController],
   providers: [
