@@ -2,7 +2,12 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { config } from 'dotenv';
-import { COLORS, MATERIALS, SIZES } from 'src/configs/contants.config';
+import {
+  CATEGORIES,
+  COLORS,
+  MATERIALS,
+  SIZES,
+} from 'src/configs/contants.config';
 config();
 
 @Injectable()
@@ -14,6 +19,7 @@ export class InitializationsService implements OnModuleInit {
     await this.initialColors();
     await this.initialSizes();
     await this.initialMaterials();
+    // await this.initalCatgories();
   }
 
   private async initialAdmin() {
@@ -110,34 +116,44 @@ export class InitializationsService implements OnModuleInit {
       return error;
     }
   }
-  // private async initalCatgories() {
-  //   try {
-  //     const foundExistedAdmin = await this.prisma.user.findFirst({
-  //       where: {
-  //         userType: 'ADMIN',
-  //       },
-  //     });
-  //     if (!foundExistedAdmin) {
-  //       const usernameAdmin = process.env.USERNAME_ADMIN;
-  //       const passwordAdmin = process.env.PASSWORD_ADMIN;
-  //       const saltOrRounds = process.env.SALT_ROUNDS;
-  //       const hashedPassword = await bcrypt.hash(
-  //         passwordAdmin,
-  //         Number(saltOrRounds),
-  //       );
-  //       const initialAdmin = await this.prisma.user.create({
-  //         data: {
-  //           username: usernameAdmin,
-  //           password: hashedPassword,
-  //           userType: 'ADMIN',
-  //           isAdministrator: true,
-  //         },
-  //       });
-  //     }
-  //     console.log('🌻🌻🌻 Initialized Successful !!! 🍔🍔🍔');
-  //   } catch (error) {
-  //     console.log({ initialAdminError: error });
-  //     return error;
-  //   }
-  // }
+  private async initalCatgories() {
+    try {
+      const countExistedCategories = await this.prisma.category.count();
+      const a = await this.prisma.subCategory.findMany({}); //
+      // if (countExistedCategories === 0) {
+      // for (const category of CATEGORIES) {
+      //   let createdCategory = await this.prisma.category.create({
+      //     data: {
+      //       name: category.name,
+      //       nameEN: category.nameEN,
+      //       description: category.description,
+      //     },
+      //   }); // category main
+
+      //   // if (category?.subCatgories.length > 0) {
+      //   //   for (const subCategory of category.subCatgories) {
+      //   //     console.log({
+      //   //       name: subCategory.name,
+      //   //       description: subCategory.description,
+      //   //       nameEN: subCategory.nameEN,
+      //   //       categoryId: createdCategory.id,
+      //   //     });
+      //   //     await this.prisma.subCategory.create({
+      //   //       data: {
+      //   //         name: subCategory.name,
+      //   //         description: subCategory.description,
+      //   //         nameEN: subCategory.nameEN,
+      //   //         categoryId: createdCategory.id,
+      //   //       },
+      //   //     }); //
+      //   //   }
+      //   // }
+      // }
+      // }
+      console.log('👘👖👠👡👞 Initialized categories Successful !!! 👒🎩👟👢 ');
+    } catch (error) {
+      console.log({ initialCategoriesError: error });
+      return error;
+    }
+  }
 }

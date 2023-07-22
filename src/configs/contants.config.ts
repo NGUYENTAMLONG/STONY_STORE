@@ -11,7 +11,7 @@ export const CATEGORIES = [
       'Quần là loại trang phục mặc từ eo đến mắt cá chân hoặc che đến đầu gối, cao hoặc thấp hơn đầu gối tùy loại, che phủ từng chân riêng biệt (khác với váy hoặc đầm).',
     descriptionEN:
       'a piece of clothing that covers the lower part of the body from the waist to the feet, consisting of two cylinder-shaped parts, one for each leg, that are joined at the top',
-    subCatgory: [
+    subCatgories: [
       {
         name: 'Quần Jeans',
         nameEN: 'Jeans',
@@ -42,6 +42,12 @@ export const CATEGORIES = [
         description: '',
         descriptionEN: '',
       },
+      {
+        name: 'Quần jogger',
+        nameEN: 'Jogger pants',
+        description: '',
+        descriptionEN: '',
+      },
     ],
   },
   {
@@ -49,7 +55,7 @@ export const CATEGORIES = [
     nameEN: 'Shirt',
     description: '',
     descriptionEN: '',
-    subCatgory: [
+    subCatgories: [
       {
         name: 'Áo khoác',
         nameEN: 'Jacket',
@@ -92,6 +98,12 @@ export const CATEGORIES = [
         description: '',
         descriptionEN: '',
       },
+      {
+        name: 'Áo Hoodie',
+        nameEN: 'Hoodie',
+        description: '',
+        descriptionEN: '',
+      },
     ],
   },
   {
@@ -99,7 +111,7 @@ export const CATEGORIES = [
     nameEN: 'Accessories',
     description: '',
     descriptionEN: '',
-    subCatgory: [
+    subCatgories: [
       {
         name: 'Thắt lưng',
         nameEN: 'Belt',
@@ -136,6 +148,12 @@ export const CATEGORIES = [
         description: '',
         descriptionEN: '',
       },
+      {
+        name: 'Tất/Vớ',
+        nameEN: 'Socks',
+        description: '',
+        descriptionEN: '',
+      },
     ],
   },
   {
@@ -143,7 +161,7 @@ export const CATEGORIES = [
     nameEN: 'Shoes',
     description: '',
     descriptionEN: '',
-    subCatgory: [
+    subCatgories: [
       {
         name: 'Giày thể thao',
         nameEN: 'Sport Shoes',
@@ -181,7 +199,7 @@ export const CATEGORIES = [
     nameEN: 'Sandal',
     description: '',
     descriptionEN: '',
-    subCatgory: [
+    subCatgories: [
       {
         name: 'Quai hậu',
         nameEN: 'Sandal',
@@ -207,7 +225,7 @@ export const CATEGORIES = [
     nameEN: 'Hat',
     description: '',
     descriptionEN: '',
-    subCatgory: [
+    subCatgories: [
       {
         name: 'Mũ lưỡi trai',
         nameEN: 'Cap',
@@ -245,7 +263,7 @@ export const CATEGORIES = [
     nameEN: 'Bag',
     description: '',
     descriptionEN: '',
-    subCatgory: [
+    subCatgories: [
       {
         name: 'Túi thể thao',
         nameEN: 'Sport bag',
@@ -267,6 +285,12 @@ export const CATEGORIES = [
       {
         name: 'Balo',
         nameEN: 'Backpack',
+        description: '',
+        descriptionEN: '',
+      },
+      {
+        name: 'Túi đeo chéo',
+        nameEN: 'Crossbody bag',
         description: '',
         descriptionEN: '',
       },

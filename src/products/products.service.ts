@@ -23,39 +23,40 @@ export class ProductsService {
   public async createOneProduct(
     payload: CreateProductDto,
     variant?: any,
-  ): Promise<Product> {
-    try {
-      const {
-        name,
-        code,
-        categoryId,
-        description,
-        discount,
-        price,
-        tax,
-        importPrice,
-        hot,
-        ...rest
-      } = payload;
-      const createdProduct = await this.prisma.product.create({
-        data: {
-          name,
-          code,
-          categoryId,
-          description,
-          discount,
-          price,
-          tax,
-          importPrice,
-          hot,
-          ...rest,
-        },
-      });
-      if (variant) {
-      }
-    } catch (error) {
-      console.log({ createProductError: error });
-      return error;
-    }
+  ) // : Promise<Product>
+  {
+    // try {
+    //   const {
+    //     name,
+    //     code,
+    //     categoryId,
+    //     description,
+    //     discount,
+    //     price,
+    //     tax,
+    //     importPrice,
+    //     hot,
+    //     ...rest
+    //   } = payload;
+    //   const createdProduct = await this.prisma.product.create({
+    //     data: {
+    //       name,
+    //       code,
+    //       categoryId,
+    //       description,
+    //       discount,
+    //       price,
+    //       tax,
+    //       importPrice,
+    //       hot,
+    //       ...rest,
+    //     },
+    //   });
+    //   if (variant) {
+    //   }
+    // } catch (error) {
+    //   console.log({ createProductError: error });
+    //   return error;
+    // }
   }
 }

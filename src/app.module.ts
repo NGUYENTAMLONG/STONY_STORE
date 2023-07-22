@@ -13,6 +13,8 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { OrdersModule } from './orders/orders.module';
 import { CartsModule } from './carts/carts.module';
+import { OrderItemsModule } from './order-items/order-items.module';
+import { CartItemsModule } from './cart-items/cart-items.module';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
@@ -26,6 +28,8 @@ import { CartsModule } from './carts/carts.module';
     ColorsModule,
     OrdersModule,
     CartsModule,
+    OrderItemsModule,
+    CartItemsModule,
   ],
   controllers: [AppController],
   providers: [
