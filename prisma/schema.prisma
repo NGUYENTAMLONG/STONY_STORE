@@ -29,6 +29,7 @@ model User {
   updatedAt       DateTime  @updatedAt
   metadata        Json?
   Order           Order[]
+  Contact         Contact[]
 }
 
 model Role {
@@ -323,12 +324,49 @@ model Order {
 }
 
 model Voucher {
-  id        Int       @id @default(autoincrement())
-  code      String    @unique
-  discount  Float
-  validFrom DateTime?
-  validTo   DateTime?
-  orders    Order[]
+  id         Int       @id @default(autoincrement())
+  code       String    @unique
+  discount   Float
+  validFrom  DateTime?
+  validTo    DateTime?
+  orders     Order[]
+  quantity   BigInt?
+  metadata   Json?
+  deletedFlg Boolean   @default(false)
+  deletedAt  DateTime?
+  createdBy  Int?
+  createdAt  DateTime  @default(now())
+  updatedBy  Int?
+  updatedAt  DateTime  @updatedAt
+}
+
+model Banner {
+  id         Int       @id @default(autoincrement())
+  title      String?
+  desc       String?
+  url        String
+  metadata   Json?
+  deletedFlg Boolean   @default(false)
+  deletedAt  DateTime?
+  createdBy  Int?
+  createdAt  DateTime  @default(now())
+  updatedBy  Int?
+  updatedAt  DateTime  @updatedAt
+}
+
+model Contact {
+  id        Int                     @id @default(autoincrement())
+  email     String?
+  title     String                  @db.Text
+  content   String                  @db.Text
+  status    ContactProcessingStatus @default(WAITING)
+  Type      ContactType             @default(EXCHANGE)
+  createdAt DateTime                @default(now())
+  updatedAt DateTime                @updatedAt
+  deletedAt DateTime?
+
+  User   User? @relation(fields: [userId], references: [id])
+  userId Int?
 }
 
 model OrderItem {
@@ -376,4 +414,16 @@ enum OrderStatus {
   REQUIRED_ACTION
   CANCELED
   CLOSED
+}
+
+enum ContactProcessingStatus {
+  WAITING
+  PROCESSING
+  DONE
+}
+
+enum ContactType {
+  BUG
+  EXCHANGE
+  ANOTHER
 }
