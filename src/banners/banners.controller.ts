@@ -15,7 +15,13 @@ import { Controller } from '@nestjs/common';
 import { BannersService } from './banners.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { imageFileFilter } from 'src/validators/validation-file';
-import { CreateBannerDto, UpdateBannerDto } from './dtos/banners.dto';
+import {
+  CreateBannerDto,
+  DeleteMultipleDto,
+  IsDeleteImageDto,
+  RestoreMultipleDto,
+  UpdateBannerDto,
+} from './dtos/banners.dto';
 import { diskStorage } from 'multer';
 import { editFileName } from 'src/helpers/file.helper';
 
@@ -53,6 +59,14 @@ export class BannersController {
     return this.bannersService.createOneBanner(payload, banner);
   }
 
+  @Patch('/restore/:id')
+  public async restoreBanner(
+    // @Param('id') bannerId: number,
+    @Param('id', new ParseIntPipe({ optional: true })) bannerId: number,
+  ) {
+    return this.bannersService.restoreOneBanner(bannerId);
+  }
+
   @Patch(':id')
   @UseInterceptors(
     FileInterceptor('banner', {
@@ -70,5 +84,37 @@ export class BannersController {
     @UploadedFile() banner?: Express.Multer.File,
   ) {
     return this.bannersService.updateOneBanner(bannerId, payload, banner);
+  }
+
+  @Get(':id')
+  public async findBanner(
+    @Param('id', new ParseIntPipe({ optional: true })) bannerId: number,
+  ) {
+    return this.bannersService.getOneById(bannerId);
+  }
+
+  @Delete('/soft-delete/:id')
+  public async softDeleteBanner(
+    @Param('id', new ParseIntPipe({ optional: true })) bannerId: number,
+  ) {
+    return this.bannersService.softDeleteOneById(bannerId);
+  }
+
+  @Delete('/soft-delete-multiple')
+  async deleteMultipleRecords(@Body() payload: DeleteMultipleDto) {
+    return this.bannersService.softDeleteMultiple(payload);
+  }
+
+  @Put('/restore-multiple')
+  async restoreMultipleRecords(@Body() payload: RestoreMultipleDto) {
+    return this.bannersService.restoreMultiple(payload);
+  }
+
+  @Delete('/force-delete/:id')
+  public async forceDeleteBanner(
+    @Param('id', new ParseIntPipe({ optional: true })) bannerId: number,
+    @Body() payload: IsDeleteImageDto,
+  ) {
+    return this.bannersService.forceDeleteOneById(bannerId, payload);
   }
 }

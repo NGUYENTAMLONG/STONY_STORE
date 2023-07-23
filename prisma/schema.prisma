@@ -43,7 +43,7 @@ model Role {
   updatedBy   Int?
   updatedAt   DateTime     @updatedAt
   metadata    Json?
-  User        User?        @relation(fields: [userId], references: [id])
+  User        User?        @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      Int?
 }
 
@@ -63,7 +63,7 @@ model Permission {
 model Avatar {
   id         Int       @id @default(autoincrement())
   url        String
-  profile    Profile   @relation(fields: [profileId], references: [id])
+  profile    Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
   profileId  Int       @unique
   //
   deletedFlg Boolean   @default(false)
@@ -85,7 +85,7 @@ model Profile {
   address     String?
   avatar      Avatar?
   userId      Int       @unique
-  user        User      @relation(fields: [userId], references: [id])
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   // 
   deletedFlg  Boolean   @default(false)
   deletedAt   DateTime?
@@ -99,7 +99,7 @@ model Profile {
 model Address {
   id            Int       @id @default(autoincrement())
   userId        Int
-  user          User      @relation(fields: [userId], references: [id])
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   street        String?
   city          String?
   state         String?
@@ -118,7 +118,7 @@ model Address {
 model Cart {
   id         Int        @id @default(autoincrement())
   userId     Int        @unique
-  user       User       @relation(fields: [userId], references: [id])
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   cartItems  CartItem[]
   // 
   deletedFlg Boolean    @default(false)
@@ -136,9 +136,9 @@ model CartItem {
   productId  Int
   variantId  Int
   quantity   Int
-  cart       Cart           @relation(fields: [cartId], references: [id])
-  product    Product        @relation(fields: [productId], references: [id])
-  variant    ProductVariant @relation(fields: [variantId], references: [id])
+  cart       Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product    Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variant    ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
   metadata   Json?
   deletedFlg Boolean        @default(false)
   deletedAt  DateTime?
@@ -157,6 +157,7 @@ model Category {
   SubCategory  SubCategory[]
   introduction String?
   metadata     Json?
+  thumbnail    String?
   // 
   deletedFlg   Boolean       @default(false)
   deletedAt    DateTime?
@@ -173,9 +174,10 @@ model SubCategory {
   description  String?   @db.Text
   products     Product[]
   categoryId   Int
-  category     Category? @relation(fields: [categoryId], references: [id])
+  category     Category? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   introduction String?
   metadata     Json?
+  thumbnail    String?
   // 
   deletedFlg   Boolean   @default(false)
   deletedAt    DateTime?
@@ -198,9 +200,9 @@ model Product {
   hot           Boolean?
   status        ProductStatus    @default(AVAILABLE)
   categoryId    Int
-  category      Category         @relation(fields: [categoryId], references: [id])
+  category      Category         @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   subCategoryId Int
-  subCategory   SubCategory      @relation(fields: [subCategoryId], references: [id])
+  subCategory   SubCategory      @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
   variants      ProductVariant[]
   images        ProductImage[]
   CartItem      CartItem[]
@@ -266,9 +268,9 @@ model ProductVariant {
   colorId    Int
   sizeId     Int
   stock      Int?
-  product    Product     @relation(fields: [productId], references: [id])
-  color      Color       @relation(fields: [colorId], references: [id])
-  size       Size        @relation(fields: [sizeId], references: [id])
+  product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  color      Color       @relation(fields: [colorId], references: [id], onDelete: Cascade)
+  size       Size        @relation(fields: [sizeId], references: [id], onDelete: Cascade)
   CartItem   CartItem[]
   metadata   Json?
   deletedFlg Boolean     @default(false)
@@ -277,7 +279,7 @@ model ProductVariant {
   createdAt  DateTime    @default(now())
   updatedBy  Int?
   updatedAt  DateTime    @updatedAt
-  Material   Material?   @relation(fields: [materialId], references: [id])
+  Material   Material?   @relation(fields: [materialId], references: [id], onDelete: Cascade)
   materialId Int?
   OrderItem  OrderItem[]
 }
@@ -286,7 +288,7 @@ model ProductImage {
   id         Int       @id @default(autoincrement())
   productId  Int
   imageUrl   String
-  product    Product   @relation(fields: [productId], references: [id])
+  product    Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
   metadata   Json?
   deletedFlg Boolean   @default(false)
   deletedAt  DateTime?
@@ -300,9 +302,9 @@ model Order {
   id              Int         @id @default(autoincrement())
   orderNumber     String      @unique
   customerId      Int
-  customer        User        @relation(fields: [customerId], references: [id])
+  customer        User        @relation(fields: [customerId], references: [id], onDelete: Cascade)
   orderDate       DateTime    @default(now())
-  shippingAddress Address     @relation(fields: [addressId], references: [id])
+  shippingAddress Address     @relation(fields: [addressId], references: [id], onDelete: Cascade)
   items           OrderItem[]
   subtotal        Float
   tax             Float
@@ -319,7 +321,7 @@ model Order {
   createdAt       DateTime    @default(now())
   updatedBy       Int?
   updatedAt       DateTime    @updatedAt
-  Voucher         Voucher?    @relation(fields: [voucherId], references: [id])
+  Voucher         Voucher?    @relation(fields: [voucherId], references: [id], onDelete: Cascade)
   voucherId       Int?
 }
 
@@ -341,17 +343,17 @@ model Voucher {
 }
 
 model Banner {
-  id         Int       @id @default(autoincrement())
-  title      String?
-  desc       String?
-  url        String
-  metadata   Json?
-  deletedFlg Boolean   @default(false)
-  deletedAt  DateTime?
-  createdBy  Int?
-  createdAt  DateTime  @default(now())
-  updatedBy  Int?
-  updatedAt  DateTime  @updatedAt
+  id          Int       @id @default(autoincrement())
+  title       String?
+  description String?   @db.Text
+  url         String
+  metadata    Json?
+  deletedFlg  Boolean   @default(false)
+  deletedAt   DateTime?
+  createdBy   Int?
+  createdAt   DateTime  @default(now())
+  updatedBy   Int?
+  updatedAt   DateTime  @updatedAt
 }
 
 model Contact {
@@ -365,7 +367,7 @@ model Contact {
   updatedAt DateTime                @updatedAt
   deletedAt DateTime?
 
-  User   User? @relation(fields: [userId], references: [id])
+  User   User? @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int?
 }
 
@@ -376,9 +378,9 @@ model OrderItem {
   variantId  Int
   quantity   Int
   status     OrderStatus    @default(WAITING)
-  order      Order          @relation(fields: [orderId], references: [id])
-  product    Product        @relation(fields: [productId], references: [id])
-  variant    ProductVariant @relation(fields: [variantId], references: [id])
+  order      Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product    Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variant    ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
   metadata   Json?
   deletedFlg Boolean        @default(false)
   deletedAt  DateTime?

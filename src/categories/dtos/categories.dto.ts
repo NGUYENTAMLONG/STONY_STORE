@@ -10,10 +10,14 @@ import {
 } from 'class-validator';
 import { MulterFile } from '../interfaces/multer-file.interface';
 
-export class CreateBannerDto {
+export class CreateCategoryDto {
   @IsString()
   @IsOptional()
-  title?: string;
+  name?: string;
+
+  @IsString()
+  @IsOptional()
+  nameEN?: string;
 
   @IsString()
   @IsOptional()
@@ -23,11 +27,36 @@ export class CreateBannerDto {
   @IsJSON()
   metadata?: Record<string, any>;
 }
+export class CreateSubCategoryDto {
+  @IsNotEmpty()
+  // @IsInt()
+  @IsString()
+  parentCategory: number;
 
-export class UpdateBannerDto {
   @IsString()
   @IsOptional()
-  title?: string;
+  name?: string;
+
+  @IsString()
+  @IsOptional()
+  nameEN?: string;
+
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @IsOptional()
+  @IsJSON()
+  metadata?: Record<string, any>;
+}
+export class UpdateCategoryDto {
+  @IsString()
+  @IsOptional()
+  name?: string;
+
+  @IsString()
+  @IsOptional()
+  nameEN?: string;
 
   @IsString()
   @IsOptional()
