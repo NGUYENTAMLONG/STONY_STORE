@@ -2,430 +2,450 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+    provider = "mysql"
+    url      = env("DATABASE_URL")
 }
 
 model User {
-  id              Int       @id @default(autoincrement())
-  username        String    @unique
-  password        String
-  userType        UserType
-  cart            Cart?
-  shippingAddress Address[]
-  profile         Profile?
-  isAdministrator Boolean
-  roles           Role[]
-  //
-  deletedFlg      Boolean   @default(false)
-  deletedAt       DateTime?
-  createdBy       Int?
-  createdAt       DateTime  @default(now())
-  updatedBy       Int?
-  updatedAt       DateTime  @updatedAt
-  metadata        Json?
-  Order           Order[]
-  Contact         Contact[]
+    id              Int       @id @default(autoincrement())
+    username        String    @unique
+    password        String
+    userType        UserType
+    cart            Cart?
+    shippingAddress Address[]
+    profile         Profile?
+    isAdministrator Boolean
+    roles           Role[]
+    //
+    deletedFlg      Boolean   @default(false)
+    deletedAt       DateTime?
+    createdBy       Int?
+    createdAt       DateTime  @default(now())
+    updatedBy       Int?
+    updatedAt       DateTime  @updatedAt
+    metadata        Json?
+    Order           Order[]
+    Contact         Contact[]
+    reviews         Review[]
 }
 
 model Role {
-  id          Int          @id @default(autoincrement())
-  name        String       @unique
-  permissions Permission[]
-  deletedFlg  Boolean      @default(false)
-  deletedAt   DateTime?
-  createdBy   Int?
-  createdAt   DateTime     @default(now())
-  updatedBy   Int?
-  updatedAt   DateTime     @updatedAt
-  metadata    Json?
-  User        User?        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      Int?
+    id          Int          @id @default(autoincrement())
+    name        String       @unique
+    permissions Permission[]
+    deletedFlg  Boolean      @default(false)
+    deletedAt   DateTime?
+    createdBy   Int?
+    createdAt   DateTime     @default(now())
+    updatedBy   Int?
+    updatedAt   DateTime     @updatedAt
+    metadata    Json?
+    User        User?        @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId      Int?
 }
 
 model Permission {
-  id         Int       @id @default(autoincrement())
-  name       String    @unique
-  roles      Role[]
-  deletedFlg Boolean   @default(false)
-  deletedAt  DateTime?
-  createdBy  Int?
-  createdAt  DateTime  @default(now())
-  updatedBy  Int?
-  updatedAt  DateTime  @updatedAt
-  metadata   Json?
+    id         Int       @id @default(autoincrement())
+    name       String    @unique
+    roles      Role[]
+    deletedFlg Boolean   @default(false)
+    deletedAt  DateTime?
+    createdBy  Int?
+    createdAt  DateTime  @default(now())
+    updatedBy  Int?
+    updatedAt  DateTime  @updatedAt
+    metadata   Json?
 }
 
 model Avatar {
-  id         Int       @id @default(autoincrement())
-  url        String
-  profile    Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  profileId  Int       @unique
-  //
-  deletedFlg Boolean   @default(false)
-  deletedAt  DateTime?
-  createdBy  Int?
-  createdAt  DateTime  @default(now())
-  updatedBy  Int?
-  updatedAt  DateTime  @updatedAt
-  metadata   Json?
+    id         Int       @id @default(autoincrement())
+    url        String
+    profile    Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+    profileId  Int       @unique
+    //
+    deletedFlg Boolean   @default(false)
+    deletedAt  DateTime?
+    createdBy  Int?
+    createdAt  DateTime  @default(now())
+    updatedBy  Int?
+    updatedAt  DateTime  @updatedAt
+    metadata   Json?
 }
 
 model Profile {
-  id          Int       @id @default(autoincrement())
-  firstName   String
-  lastName    String
-  gender      Gender    @default(UNKNOWN)
-  email       String?   @unique
-  phoneNumber String?
-  address     String?
-  avatar      Avatar?
-  userId      Int       @unique
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  // 
-  deletedFlg  Boolean   @default(false)
-  deletedAt   DateTime?
-  createdBy   Int?
-  createdAt   DateTime  @default(now())
-  updatedBy   Int?
-  updatedAt   DateTime  @updatedAt
-  metadata    Json?
+    id          Int       @id @default(autoincrement())
+    firstName   String
+    lastName    String
+    gender      Gender    @default(UNKNOWN)
+    email       String?   @unique
+    phoneNumber String?
+    address     String?
+    avatar      Avatar?
+    userId      Int       @unique
+    user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    // 
+    deletedFlg  Boolean   @default(false)
+    deletedAt   DateTime?
+    createdBy   Int?
+    createdAt   DateTime  @default(now())
+    updatedBy   Int?
+    updatedAt   DateTime  @updatedAt
+    metadata    Json?
 }
 
 model Address {
-  id            Int       @id @default(autoincrement())
-  userId        Int
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  street        String?
-  city          String?
-  state         String?
-  postalCode    String?
-  detailAddress String?
-  metadata      Json?
-  deletedFlg    Boolean   @default(false)
-  deletedAt     DateTime?
-  createdBy     Int?
-  createdAt     DateTime  @default(now())
-  updatedBy     Int?
-  updatedAt     DateTime  @updatedAt
-  Order         Order[]
+    id            Int       @id @default(autoincrement())
+    userId        Int
+    user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    street        String?
+    city          String?
+    state         String?
+    postalCode    String?
+    detailAddress String?
+    metadata      Json?
+    deletedFlg    Boolean   @default(false)
+    deletedAt     DateTime?
+    createdBy     Int?
+    createdAt     DateTime  @default(now())
+    updatedBy     Int?
+    updatedAt     DateTime  @updatedAt
+    Order         Order[]
 }
 
 model Cart {
-  id         Int        @id @default(autoincrement())
-  userId     Int        @unique
-  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  cartItems  CartItem[]
-  // 
-  deletedFlg Boolean    @default(false)
-  deletedAt  DateTime?
-  createdBy  Int?
-  createdAt  DateTime   @default(now())
-  updatedBy  Int?
-  updatedAt  DateTime   @updatedAt
-  metadata   Json?
+    id         Int        @id @default(autoincrement())
+    userId     Int        @unique
+    user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+    cartItems  CartItem[]
+    // 
+    deletedFlg Boolean    @default(false)
+    deletedAt  DateTime?
+    createdBy  Int?
+    createdAt  DateTime   @default(now())
+    updatedBy  Int?
+    updatedAt  DateTime   @updatedAt
+    metadata   Json?
 }
 
 model CartItem {
-  id         Int            @id @default(autoincrement())
-  cartId     Int
-  productId  Int
-  variantId  Int
-  quantity   Int
-  cart       Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  product    Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
-  variant    ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
-  metadata   Json?
-  deletedFlg Boolean        @default(false)
-  deletedAt  DateTime?
-  createdBy  Int?
-  createdAt  DateTime       @default(now())
-  updatedBy  Int?
-  updatedAt  DateTime       @updatedAt
+    id         Int            @id @default(autoincrement())
+    cartId     Int
+    productId  Int
+    variantId  Int
+    quantity   Int
+    cart       Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
+    product    Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+    variant    ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+    metadata   Json?
+    deletedFlg Boolean        @default(false)
+    deletedAt  DateTime?
+    createdBy  Int?
+    createdAt  DateTime       @default(now())
+    updatedBy  Int?
+    updatedAt  DateTime       @updatedAt
 }
 
 model Category {
-  id           Int           @id @default(autoincrement())
-  name         String
-  nameEN       String?
-  description  String?       @db.Text
-  products     Product[]
-  SubCategory  SubCategory[]
-  introduction String?
-  metadata     Json?
-  thumbnail    String?
-  // 
-  deletedFlg   Boolean       @default(false)
-  deletedAt    DateTime?
-  createdBy    Int?
-  createdAt    DateTime      @default(now())
-  updatedBy    Int?
-  updatedAt    DateTime      @updatedAt
+    id           Int           @id @default(autoincrement())
+    name         String
+    nameEN       String?
+    description  String?       @db.Text
+    products     Product[]
+    SubCategory  SubCategory[]
+    introduction String?
+    metadata     Json?
+    thumbnail    String?
+    // 
+    deletedFlg   Boolean       @default(false)
+    deletedAt    DateTime?
+    createdBy    Int?
+    createdAt    DateTime      @default(now())
+    updatedBy    Int?
+    updatedAt    DateTime      @updatedAt
 }
 
 model SubCategory {
-  id           Int       @id @default(autoincrement())
-  name         String
-  nameEN       String?
-  description  String?   @db.Text
-  products     Product[]
-  categoryId   Int
-  category     Category? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  introduction String?
-  metadata     Json?
-  thumbnail    String?
-  // 
-  deletedFlg   Boolean   @default(false)
-  deletedAt    DateTime?
-  createdBy    Int?
-  createdAt    DateTime  @default(now())
-  updatedBy    Int?
-  updatedAt    DateTime  @updatedAt
+    id           Int       @id @default(autoincrement())
+    name         String
+    nameEN       String?
+    description  String?   @db.Text
+    products     Product[]
+    categoryId   Int
+    category     Category? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+    introduction String?
+    metadata     Json?
+    thumbnail    String?
+    // 
+    deletedFlg   Boolean   @default(false)
+    deletedAt    DateTime?
+    createdBy    Int?
+    createdAt    DateTime  @default(now())
+    updatedBy    Int?
+    updatedAt    DateTime  @updatedAt
 }
 
 model Product {
-  id            Int              @id @default(autoincrement())
-  name          String
-  code          String
-  description   String?          @db.Text
-  importPrice   Float?
-  price         Float
-  tax           Float?
-  discount      Float?
-  new           Boolean?
-  hot           Boolean?
-  status        ProductStatus    @default(AVAILABLE)
-  categoryId    Int
-  category      Category         @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  subCategoryId Int
-  subCategory   SubCategory      @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
-  variants      ProductVariant[]
-  images        ProductImage[]
-  CartItem      CartItem[]
-  //
-  deletedFlg    Boolean          @default(false)
-  deletedAt     DateTime?
-  createdBy     Int?
-  createdAt     DateTime         @default(now())
-  updatedBy     Int?
-  updatedAt     DateTime         @updatedAt
-  metadata      Json?
-  OrderItem     OrderItem[]
+    id            Int              @id @default(autoincrement())
+    name          String
+    code          String
+    description   String?          @db.Text
+    importPrice   Float?
+    price         Float
+    tax           Float?
+    discount      Float?
+    new           Boolean?
+    hot           Boolean?
+    status        ProductStatus    @default(AVAILABLE)
+    categoryId    Int
+    category      Category         @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+    subCategoryId Int
+    subCategory   SubCategory      @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
+    variants      ProductVariant[]
+    images        ProductImage[]
+    CartItem      CartItem[]
+    reviews       Review[]
+    //
+    deletedFlg    Boolean          @default(false)
+    deletedAt     DateTime?
+    createdBy     Int?
+    createdAt     DateTime         @default(now())
+    updatedBy     Int?
+    updatedAt     DateTime         @updatedAt
+    metadata      Json?
+    OrderItem     OrderItem[]
 }
 
 model Color {
-  id          Int              @id @default(autoincrement())
-  name        String
-  nameEN      String?
-  description String?          @db.Text
-  image       String?
-  variants    ProductVariant[]
-  metadata    Json?
-  deletedFlg  Boolean          @default(false)
-  deletedAt   DateTime?
-  createdBy   Int?
-  createdAt   DateTime         @default(now())
-  updatedBy   Int?
-  updatedAt   DateTime         @updatedAt
+    id          Int              @id @default(autoincrement())
+    name        String
+    nameEN      String?
+    description String?          @db.Text
+    image       String?
+    variants    ProductVariant[]
+    metadata    Json?
+    deletedFlg  Boolean          @default(false)
+    deletedAt   DateTime?
+    createdBy   Int?
+    createdAt   DateTime         @default(now())
+    updatedBy   Int?
+    updatedAt   DateTime         @updatedAt
 }
 
 model Size {
-  id          Int              @id @default(autoincrement())
-  name        String
-  description String?          @db.Text
-  variants    ProductVariant[]
-  metadata    Json?
-  deletedFlg  Boolean          @default(false)
-  deletedAt   DateTime?
-  createdBy   Int?
-  createdAt   DateTime         @default(now())
-  updatedBy   Int?
-  updatedAt   DateTime         @updatedAt
+    id          Int              @id @default(autoincrement())
+    name        String
+    description String?          @db.Text
+    variants    ProductVariant[]
+    metadata    Json?
+    deletedFlg  Boolean          @default(false)
+    deletedAt   DateTime?
+    createdBy   Int?
+    createdAt   DateTime         @default(now())
+    updatedBy   Int?
+    updatedAt   DateTime         @updatedAt
 }
 
 model Material {
-  id          Int              @id @default(autoincrement())
-  name        String
-  description String?          @db.Text
-  image       String?
-  variants    ProductVariant[]
-  metadata    Json?
-  deletedFlg  Boolean          @default(false)
-  deletedAt   DateTime?
-  createdBy   Int?
-  createdAt   DateTime         @default(now())
-  updatedBy   Int?
-  updatedAt   DateTime         @updatedAt
+    id          Int              @id @default(autoincrement())
+    name        String
+    description String?          @db.Text
+    image       String?
+    variants    ProductVariant[]
+    metadata    Json?
+    deletedFlg  Boolean          @default(false)
+    deletedAt   DateTime?
+    createdBy   Int?
+    createdAt   DateTime         @default(now())
+    updatedBy   Int?
+    updatedAt   DateTime         @updatedAt
 }
 
 model ProductVariant {
-  id         Int         @id @default(autoincrement())
-  productId  Int
-  colorId    Int
-  sizeId     Int
-  stock      Int?
-  product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
-  color      Color       @relation(fields: [colorId], references: [id], onDelete: Cascade)
-  size       Size        @relation(fields: [sizeId], references: [id], onDelete: Cascade)
-  CartItem   CartItem[]
-  metadata   Json?
-  deletedFlg Boolean     @default(false)
-  deletedAt  DateTime?
-  createdBy  Int?
-  createdAt  DateTime    @default(now())
-  updatedBy  Int?
-  updatedAt  DateTime    @updatedAt
-  Material   Material?   @relation(fields: [materialId], references: [id], onDelete: Cascade)
-  materialId Int?
-  OrderItem  OrderItem[]
+    id         Int         @id @default(autoincrement())
+    productId  Int
+    colorId    Int
+    sizeId     Int
+    stock      Int?
+    product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+    color      Color       @relation(fields: [colorId], references: [id], onDelete: Cascade)
+    size       Size        @relation(fields: [sizeId], references: [id], onDelete: Cascade)
+    CartItem   CartItem[]
+    metadata   Json?
+    deletedFlg Boolean     @default(false)
+    deletedAt  DateTime?
+    createdBy  Int?
+    createdAt  DateTime    @default(now())
+    updatedBy  Int?
+    updatedAt  DateTime    @updatedAt
+    Material   Material?   @relation(fields: [materialId], references: [id], onDelete: Cascade)
+    materialId Int?
+    OrderItem  OrderItem[]
 }
 
 model ProductImage {
-  id         Int       @id @default(autoincrement())
-  productId  Int
-  imageUrl   String
-  product    Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
-  metadata   Json?
-  deletedFlg Boolean   @default(false)
-  deletedAt  DateTime?
-  createdBy  Int?
-  createdAt  DateTime  @default(now())
-  updatedBy  Int?
-  updatedAt  DateTime  @updatedAt
+    id         Int       @id @default(autoincrement())
+    productId  Int
+    imageUrl   String
+    product    Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+    metadata   Json?
+    deletedFlg Boolean   @default(false)
+    deletedAt  DateTime?
+    createdBy  Int?
+    createdAt  DateTime  @default(now())
+    updatedBy  Int?
+    updatedAt  DateTime  @updatedAt
+}
+
+model Review {
+    id          Int       @id @default(autoincrement())
+    rating      Int // Assuming the rating is an integer value between 1 and 5
+    comment     String?
+    productId   Int // Foreign key referencing the Product model
+    product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+    userId      Int // Foreign key referencing the User model
+    user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    isIncognito Boolean?  @default(false) //avatar,username,email ...
+    metadata    Json?
+    deletedFlg  Boolean   @default(false)
+    deletedAt   DateTime?
+    createdBy   Int?
+    createdAt   DateTime  @default(now())
+    updatedBy   Int?
+    updatedAt   DateTime  @updatedAt
 }
 
 model Order {
-  id              Int         @id @default(autoincrement())
-  orderNumber     String      @unique
-  customerId      Int
-  customer        User        @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  orderDate       DateTime    @default(now())
-  shippingAddress Address     @relation(fields: [addressId], references: [id], onDelete: Cascade)
-  items           OrderItem[]
-  subtotal        Float
-  tax             Float
-  discount        Float
-  total           Float
-  addressId       Int
-  phoneRecipient  String
-  phoneDeliver    String?
-  status          OrderStatus @default(WAITING)
-  metadata        Json?
-  deletedFlg      Boolean     @default(false)
-  deletedAt       DateTime?
-  createdBy       Int?
-  createdAt       DateTime    @default(now())
-  updatedBy       Int?
-  updatedAt       DateTime    @updatedAt
-  Voucher         Voucher?    @relation(fields: [voucherId], references: [id], onDelete: Cascade)
-  voucherId       Int?
+    id              Int         @id @default(autoincrement())
+    orderNumber     String      @unique
+    customerId      Int
+    customer        User        @relation(fields: [customerId], references: [id], onDelete: Cascade)
+    orderDate       DateTime    @default(now())
+    shippingAddress Address     @relation(fields: [addressId], references: [id], onDelete: Cascade)
+    items           OrderItem[]
+    subtotal        Float
+    tax             Float
+    discount        Float
+    total           Float
+    addressId       Int
+    phoneRecipient  String
+    phoneDeliver    String?
+    status          OrderStatus @default(WAITING)
+    metadata        Json?
+    deletedFlg      Boolean     @default(false)
+    deletedAt       DateTime?
+    createdBy       Int?
+    createdAt       DateTime    @default(now())
+    updatedBy       Int?
+    updatedAt       DateTime    @updatedAt
+    Voucher         Voucher?    @relation(fields: [voucherId], references: [id], onDelete: Cascade)
+    voucherId       Int?
 }
 
 model Voucher {
-  id         Int       @id @default(autoincrement())
-  code       String    @unique
-  discount   Float
-  validFrom  DateTime?
-  validTo    DateTime?
-  orders     Order[]
-  quantity   BigInt?
-  metadata   Json?
-  deletedFlg Boolean   @default(false)
-  deletedAt  DateTime?
-  createdBy  Int?
-  createdAt  DateTime  @default(now())
-  updatedBy  Int?
-  updatedAt  DateTime  @updatedAt
+    id         Int       @id @default(autoincrement())
+    code       String    @unique
+    discount   Float
+    validFrom  DateTime?
+    validTo    DateTime?
+    orders     Order[]
+    quantity   BigInt?
+    metadata   Json?
+    deletedFlg Boolean   @default(false)
+    deletedAt  DateTime?
+    createdBy  Int?
+    createdAt  DateTime  @default(now())
+    updatedBy  Int?
+    updatedAt  DateTime  @updatedAt
 }
 
 model Banner {
-  id          Int       @id @default(autoincrement())
-  title       String?
-  description String?   @db.Text
-  url         String
-  metadata    Json?
-  deletedFlg  Boolean   @default(false)
-  deletedAt   DateTime?
-  createdBy   Int?
-  createdAt   DateTime  @default(now())
-  updatedBy   Int?
-  updatedAt   DateTime  @updatedAt
+    id          Int       @id @default(autoincrement())
+    title       String?
+    description String?   @db.Text
+    url         String
+    metadata    Json?
+    deletedFlg  Boolean   @default(false)
+    deletedAt   DateTime?
+    createdBy   Int?
+    createdAt   DateTime  @default(now())
+    updatedBy   Int?
+    updatedAt   DateTime  @updatedAt
 }
 
 model Contact {
-  id        Int                     @id @default(autoincrement())
-  email     String?
-  title     String                  @db.Text
-  content   String                  @db.Text
-  status    ContactProcessingStatus @default(WAITING)
-  Type      ContactType             @default(EXCHANGE)
-  createdAt DateTime                @default(now())
-  updatedAt DateTime                @updatedAt
-  deletedAt DateTime?
-
-  User   User? @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId Int?
+    id         Int                     @id @default(autoincrement())
+    email      String?
+    title      String                  @db.Text
+    content    String                  @db.Text
+    status     ContactProcessingStatus @default(WAITING)
+    Type       ContactType             @default(EXCHANGE)
+    createdAt  DateTime                @default(now())
+    updatedAt  DateTime                @updatedAt
+    deletedAt  DateTime?
+    deletedFlg Boolean                 @default(false)
+    User       User?                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId     Int?
 }
 
 model OrderItem {
-  id         Int            @id @default(autoincrement())
-  orderId    Int
-  productId  Int
-  variantId  Int
-  quantity   Int
-  status     OrderStatus    @default(WAITING)
-  order      Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product    Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
-  variant    ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
-  metadata   Json?
-  deletedFlg Boolean        @default(false)
-  deletedAt  DateTime?
-  createdBy  Int?
-  createdAt  DateTime       @default(now())
-  updatedBy  Int?
-  updatedAt  DateTime       @updatedAt
+    id         Int            @id @default(autoincrement())
+    orderId    Int
+    productId  Int
+    variantId  Int
+    quantity   Int
+    status     OrderStatus    @default(WAITING)
+    order      Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+    product    Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+    variant    ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+    metadata   Json?
+    deletedFlg Boolean        @default(false)
+    deletedAt  DateTime?
+    createdBy  Int?
+    createdAt  DateTime       @default(now())
+    updatedBy  Int?
+    updatedAt  DateTime       @updatedAt
 }
 
 enum UserType {
-  CUSTOMER
-  ADMIN
+    CUSTOMER
+    ADMIN
 }
 
 enum Gender {
-  MALE
-  FEMALE
-  NONBINARY
-  UNKNOWN
+    MALE
+    FEMALE
+    NONBINARY
+    UNKNOWN
 }
 
 enum ProductStatus {
-  INSTOCK
-  AVAILABLE
-  SOLD_OUT
+    INSTOCK
+    AVAILABLE
+    SOLD_OUT
 }
 
 enum OrderStatus {
-  WAITING
-  CONFIRMED
-  SHIPPING
-  COMPLETED
-  REQUIRED_ACTION
-  CANCELED
-  CLOSED
+    WAITING
+    CONFIRMED
+    SHIPPING
+    COMPLETED
+    REQUIRED_ACTION
+    CANCELED
+    CLOSED
 }
 
 enum ContactProcessingStatus {
-  WAITING
-  PROCESSING
-  DONE
+    WAITING
+    PROCESSING
+    DONE
 }
 
 enum ContactType {
-  BUG
-  EXCHANGE
-  ANOTHER
+    BUG
+    EXCHANGE
+    ANOTHER
 }
