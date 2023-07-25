@@ -10,6 +10,7 @@ import {
   DeleteMultipleDto,
   IsDeleteImageDto,
   RestoreMultipleDto,
+  UpdateBannerDto,
   UploadFileDto,
 } from './dtos/banners.dto';
 import { EXCEPTION_BANNER } from './contants/banner.constant';
@@ -71,7 +72,7 @@ export class BannersService {
 
   public async updateOneBanner(
     bannerId: number,
-    payload: CreateBannerDto,
+    payload: UpdateBannerDto,
     banner?: Express.Multer.File,
   ): Promise<Banner> {
     try {

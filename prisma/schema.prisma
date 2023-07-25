@@ -106,6 +106,7 @@ model Address {
     state         String?
     postalCode    String?
     detailAddress String?
+    isDefault     Boolean   @default(false)
     metadata      Json?
     deletedFlg    Boolean   @default(false)
     deletedAt     DateTime?

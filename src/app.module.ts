@@ -20,6 +20,8 @@ import { CategoriesModule } from './categories/categories.module';
 import { MaterialsModule } from './materials/materials.module';
 import { ContactsModule } from './contacts/contacts.module';
 import { SizesModule } from './sizes/sizes.module';
+import { AddressesModule } from './addresses/addresses.module';
+import { VouchersModule } from './voucher/vouchers.module';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
@@ -40,6 +42,8 @@ import { SizesModule } from './sizes/sizes.module';
     MaterialsModule,
     ContactsModule,
     SizesModule,
+    AddressesModule,
+    VouchersModule,
   ],
   controllers: [AppController],
   providers: [
