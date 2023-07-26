@@ -15,6 +15,14 @@ import { OrdersModule } from './orders/orders.module';
 import { CartsModule } from './carts/carts.module';
 import { OrderItemsModule } from './order-items/order-items.module';
 import { CartItemsModule } from './cart-items/cart-items.module';
+import { BannersModule } from './banners/banners.module';
+import { CategoriesModule } from './categories/categories.module';
+import { MaterialsModule } from './materials/materials.module';
+import { ContactsModule } from './contacts/contacts.module';
+import { SizesModule } from './sizes/sizes.module';
+import { AddressesModule } from './addresses/addresses.module';
+import { VouchersModule } from './voucher/vouchers.module';
+import { EventsModule } from './events/events.module';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
@@ -30,6 +38,14 @@ import { CartItemsModule } from './cart-items/cart-items.module';
     CartsModule,
     OrderItemsModule,
     CartItemsModule,
+    BannersModule,
+    CategoriesModule,
+    MaterialsModule,
+    ContactsModule,
+    SizesModule,
+    AddressesModule,
+    VouchersModule,
+    EventsModule,
   ],
   controllers: [AppController],
   providers: [

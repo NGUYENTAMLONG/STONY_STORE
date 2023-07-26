@@ -45,8 +45,8 @@ export class InitializationsService implements OnModuleInit {
             isAdministrator: true,
           },
         });
+        console.log('🌻🌻🌻 Initialized Successful !!! 🍔🍔🍔');
       }
-      console.log('🌻🌻🌻 Initialized Successful !!! 🍔🍔🍔');
     } catch (error) {
       console.log({ initialAdminError: error });
       return error;
@@ -67,8 +67,8 @@ export class InitializationsService implements OnModuleInit {
             },
           });
         }
+        console.log('❤️💛💚 Initialized Colors Successful !!! 💙💜🖤');
       }
-      console.log('❤️💛💚 Initialized Colors Successful !!! 💙💜🖤');
     } catch (error) {
       console.log({ initialColorsError: error });
       return error;
@@ -87,8 +87,8 @@ export class InitializationsService implements OnModuleInit {
             },
           });
         }
+        console.log('🐡🐬🐢 Initialized Sizes Successful !!! 🐊😻🐘');
       }
-      console.log('🐡🐬🐢 Initialized Sizes Successful !!! 🐊😻🐘');
     } catch (error) {
       console.log({ initialSizesError: error });
       return error;
@@ -109,8 +109,8 @@ export class InitializationsService implements OnModuleInit {
             },
           });
         }
+        console.log('🐡🐬🐢 Initialized materials Successful !!! 🐊😻🐘');
       }
-      console.log('🐡🐬🐢 Initialized materials Successful !!! 🐊😻🐘');
     } catch (error) {
       console.log({ initialMaterialsError: error });
       return error;
