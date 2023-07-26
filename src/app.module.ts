@@ -22,6 +22,7 @@ import { ContactsModule } from './contacts/contacts.module';
 import { SizesModule } from './sizes/sizes.module';
 import { AddressesModule } from './addresses/addresses.module';
 import { VouchersModule } from './voucher/vouchers.module';
+import { EventsModule } from './events/events.module';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
@@ -44,6 +45,7 @@ import { VouchersModule } from './voucher/vouchers.module';
     SizesModule,
     AddressesModule,
     VouchersModule,
+    EventsModule,
   ],
   controllers: [AppController],
   providers: [

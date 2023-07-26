@@ -28,8 +28,8 @@ model User {
     updatedBy       Int?
     updatedAt       DateTime  @updatedAt
     metadata        Json?
-    Order           Order[]
-    Contact         Contact[]
+    order           Order[]
+    contact         Contact[]
     reviews         Review[]
 }
 
@@ -44,7 +44,7 @@ model Role {
     updatedBy   Int?
     updatedAt   DateTime     @updatedAt
     metadata    Json?
-    User        User?        @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user        User?        @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId      Int?
 }
 
@@ -114,7 +114,7 @@ model Address {
     createdAt     DateTime  @default(now())
     updatedBy     Int?
     updatedAt     DateTime  @updatedAt
-    Order         Order[]
+    order         Order[]
 }
 
 model Cart {
@@ -156,7 +156,7 @@ model Category {
     nameEN       String?
     description  String?       @db.Text
     products     Product[]
-    SubCategory  SubCategory[]
+    subCategory  SubCategory[]
     introduction String?
     metadata     Json?
     thumbnail    String?
@@ -189,6 +189,28 @@ model SubCategory {
     updatedAt    DateTime  @updatedAt
 }
 
+model Event {
+    id           Int       @id @default(autoincrement())
+    title        String
+    introduction String?
+    description  String?   @db.Text
+    products     Product[]
+    image        String?
+    validFrom    DateTime
+    validTo      DateTime
+    condition    Json?
+    salePercent  Float?
+    discount     Float?
+    // 
+    metadata     Json?
+    deletedFlg   Boolean   @default(false)
+    deletedAt    DateTime?
+    createdBy    Int?
+    createdAt    DateTime  @default(now())
+    updatedBy    Int?
+    updatedAt    DateTime  @updatedAt
+}
+
 model Product {
     id            Int              @id @default(autoincrement())
     name          String
@@ -205,9 +227,11 @@ model Product {
     category      Category         @relation(fields: [categoryId], references: [id], onDelete: Cascade)
     subCategoryId Int
     subCategory   SubCategory      @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
+    event         Event?           @relation(fields: [eventId], references: [id])
+    eventId       Int?
     variants      ProductVariant[]
     images        ProductImage[]
-    CartItem      CartItem[]
+    cartItem      CartItem[]
     reviews       Review[]
     //
     deletedFlg    Boolean          @default(false)
@@ -217,7 +241,7 @@ model Product {
     updatedBy     Int?
     updatedAt     DateTime         @updatedAt
     metadata      Json?
-    OrderItem     OrderItem[]
+    orderItem     OrderItem[]
 }
 
 model Color {
@@ -274,7 +298,7 @@ model ProductVariant {
     product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
     color      Color       @relation(fields: [colorId], references: [id], onDelete: Cascade)
     size       Size        @relation(fields: [sizeId], references: [id], onDelete: Cascade)
-    CartItem   CartItem[]
+    cartItem   CartItem[]
     metadata   Json?
     deletedFlg Boolean     @default(false)
     deletedAt  DateTime?
@@ -282,9 +306,9 @@ model ProductVariant {
     createdAt  DateTime    @default(now())
     updatedBy  Int?
     updatedAt  DateTime    @updatedAt
-    Material   Material?   @relation(fields: [materialId], references: [id], onDelete: Cascade)
+    material   Material?   @relation(fields: [materialId], references: [id], onDelete: Cascade)
     materialId Int?
-    OrderItem  OrderItem[]
+    orderItem  OrderItem[]
 }
 
 model ProductImage {
@@ -342,7 +366,7 @@ model Order {
     createdAt       DateTime    @default(now())
     updatedBy       Int?
     updatedAt       DateTime    @updatedAt
-    Voucher         Voucher?    @relation(fields: [voucherId], references: [id], onDelete: Cascade)
+    voucher         Voucher?    @relation(fields: [voucherId], references: [id], onDelete: Cascade)
     voucherId       Int?
 }
 
@@ -388,7 +412,7 @@ model Contact {
     updatedAt  DateTime                @updatedAt
     deletedAt  DateTime?
     deletedFlg Boolean                 @default(false)
-    User       User?                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user       User?                   @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId     Int?
 }
 
