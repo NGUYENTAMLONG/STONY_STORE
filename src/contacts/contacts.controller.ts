@@ -43,26 +43,25 @@ export class ContactsController {
     };
   }
 
-  @Post()
-  @UseInterceptors(
-    FilesInterceptor('contactImages', 10, {
-      storage: diskStorage({
-        destination: './src/public/images/contacts',
-        filename: editFileName,
-      }),
-      fileFilter: imageFileFilter,
-    }),
-  )
-  public async createContact(
-    @Body() payload: CreateContactDto,
-    @UploadedFiles() contactImages: Express.Multer.File[],
-  ) {
-    return this.contactsService.createOneContact(payload, contactImages);
-  }
+  // @Post()
+  // @UseInterceptors(
+  //   FilesInterceptor('contactImages', 10, {
+  //     storage: diskStorage({
+  //       destination: './src/public/images/contacts',
+  //       filename: editFileName,
+  //     }),
+  //     fileFilter: imageFileFilter,
+  //   }),
+  // )
+  // public async createContact(
+  //   @Body() payload: CreateContactDto,
+  //   @UploadedFiles() contactImages: Express.Multer.File[],
+  // ) {
+  //   return this.contactsService.createOneContact(payload, contactImages);
+  // }
 
   @Patch('/restore/:id')
   public async restoreContact(
-    // @Param('id') bannerId: number,
     @Param('id', new ParseIntPipe({ optional: true })) contactId: number,
   ) {
     return this.contactsService.restoreOneContact(contactId);
@@ -78,18 +77,17 @@ export class ContactsController {
       fileFilter: imageFileFilter,
     }),
   )
-  public async updateContact(
-    // @Param('id') bannerId: number,
-    @Param('id', new ParseIntPipe({ optional: true })) contactId: number,
-    @Body() payload: UpdateContactDto,
-    @UploadedFiles() contactImages?: Express.Multer.File[],
-  ) {
-    return this.contactsService.updateOneContact(
-      contactId,
-      payload,
-      contactImages,
-    );
-  }
+  // public async updateContact(
+  //   @Param('id', new ParseIntPipe({ optional: true })) contactId: number,
+  //   @Body() payload: UpdateContactDto,
+  //   @UploadedFiles() contactImages?: Express.Multer.File[],
+  // ) {
+  //   return this.contactsService.updateOneContact(
+  //     contactId,
+  //     payload,
+  //     contactImages,
+  //   );
+  // }
 
   @Get(':id')
   public async findContact(

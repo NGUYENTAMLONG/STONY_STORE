@@ -3,9 +3,10 @@ import { PassportModule } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 import { UsersModule } from 'src/users/users.module';
 import { config } from 'dotenv';
+import { UsersService } from 'src/users/users.service';
 config();
 
 @Module({
@@ -17,7 +18,7 @@ config();
     }),
     UsersModule,
   ],
-  providers: [AuthService, JwtStrategy],
+  providers: [JwtStrategy, AuthService],
   controllers: [AuthController],
   exports: [AuthService],
 })

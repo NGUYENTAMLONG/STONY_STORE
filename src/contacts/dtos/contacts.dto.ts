@@ -17,7 +17,7 @@ export class CreateContactDto {
 
   @IsString()
   @IsOptional()
-  description?: string;
+  content?: string;
 
   @IsOptional()
   @IsJSON()
@@ -31,7 +31,7 @@ export class UpdateContactDto {
 
   @IsString()
   @IsOptional()
-  description?: string;
+  content?: string;
 
   @IsOptional()
   @IsJSON()

@@ -8,6 +8,7 @@ import {
   Patch,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
@@ -16,12 +17,15 @@ import {
   UserIdArrayDto,
 } from './dtos/users.dto';
 import { UpdateProfileDto } from './dtos/profile.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { AuthorizationGuard } from 'src/auth/authorization.guard';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get('')
+  @UseGuards(AuthorizationGuard)
   public async getUserList(
     @Query('page', new ParseIntPipe({ optional: true })) page: number = 1,
     @Query('limit', new ParseIntPipe({ optional: true })) limit: number = 10,
@@ -83,22 +87,22 @@ export class UsersController {
 
   @Delete('/soft-delete/:id')
   public async softDeleteUser(@Param('id') id: number) {
-    const user = await this.usersService.softDeleteOne(id);
-    return user;
+    const result = await this.usersService.softDeleteOne(id);
+    return result;
   }
   @Delete('/force-delete/:id')
   public async forceDeleteUser(@Param('id') id: number) {
-    const user = await this.usersService.forceDeleteOne(id);
-    return user;
+    const result = await this.usersService.forceDeleteOne(id);
+    return result;
   }
   @Delete('/soft-delete-many')
   public async softDeleteUsers(@Body() payload: UserIdArrayDto) {
-    const user = await this.usersService.softDeleteMultiple(payload);
-    return user;
+    const result = await this.usersService.softDeleteMultiple(payload);
+    return result;
   }
   @Delete('/force-delete-many')
   public async forceDeleteUsers(@Body() payload: UserIdArrayDto) {
-    const user = await this.usersService.forceDeleteMultiple(payload);
-    return user;
+    const result = await this.usersService.forceDeleteMultiple(payload);
+    return result;
   }
 }

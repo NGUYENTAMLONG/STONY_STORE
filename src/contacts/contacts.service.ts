@@ -16,27 +16,27 @@ export class ContactsService {
   public async getList(page: number, limit: number): Promise<Contact[]> {
     try {
       const offset = (page - 1) * limit;
-      const banners = await this.prisma.contact.findMany({
+      const contact = await this.prisma.contact.findMany({
         where: {
           deletedAt: null,
-          //   deletedFlg: false,
+          deletedFlg: false,
         },
         skip: offset,
         take: limit,
       });
-      return banners;
+      return contact;
     } catch (error) {
-      console.log({ bannerListError: error });
+      console.log({ contactListError: error });
       return error;
     }
   }
 
   public async createOneContact(
     payload: CreateContactDto,
-    banner: Express.Multer.File,
+    imageContact: Express.Multer.File,
   ): Promise<Contact> {
     try {
-      const { title, description, metadata } = payload;
+      const { title, content, metadata } = payload;
       const {
         fieldname,
         mimetype,
@@ -47,97 +47,97 @@ export class ContactsService {
         destination,
         path,
         stream,
-      } = banner;
-      const createBanner = await this.prisma.contact.create({
+      } = imageContact;
+      const createContact = await this.prisma.contact.create({
         data: {
           title,
-          description,
-          url: `/images/banners/${filename}`,
-          metadata: metadata,
+          content,
+          image: `/images/contacts/${filename}`,
+          // metadata,
         },
       });
-      return createBanner;
+      return createContact;
     } catch (error) {
-      console.log({ createBannerError: error });
+      console.log({ createContactError: error });
       return error;
     }
   }
 
-  public async updateOneContact(
-    bannerId: number,
-    payload: CreateContactDto,
-    banner?: Express.Multer.File,
-  ): Promise<Contact> {
-    try {
-      const { title, description, metadata } = payload;
-      const foundBanner = await this.prisma.contact.findFirst({
-        where: {
-          id: bannerId,
-        },
-      });
-      if (!foundBanner) {
-        throw new BadRequestException(EXCEPTION_CONTACT.CONTACT_NOT_FOUND);
-      }
-      let data = {
-        title,
-        description,
-        metadata: metadata,
-      };
-      if (banner?.filename) {
-        data['url'] = `/images/banners/${banner.filename}`;
-      }
-      const updateBanner = await this.prisma.contact.update({
-        where: {
-          id: bannerId,
-        },
-        data,
-      });
-      return updateBanner;
-    } catch (error) {
-      console.log({ updateBannerError: error });
-      return error;
-    }
-  }
+  // public async updateOneContact(
+  //   contactId: number,
+  //   payload: CreateContactDto,
+  //   imageContact?: Express.Multer.File[],
+  // ): Promise<Contact> {
+  //   try {
+  //     const { title, content, metadata } = payload;
+  //     const foundContact = await this.prisma.contact.findFirst({
+  //       where: {
+  //         id: contactId,
+  //       },
+  //     });
+  //     if (!foundContact) {
+  //       throw new BadRequestException(EXCEPTION_CONTACT.CONTACT_NOT_FOUND);
+  //     }
+  //     let data = {
+  //       title,
+  //       content,
+  //       metadata: metadata,
+  //     };
+  //     if (imageContact?.filename) {
+  //       data['image'] = `/images/contacts/${imageContact.filename}`;
+  //     }
+  //     const updateContact = await this.prisma.contact.update({
+  //       where: {
+  //         id: contactId,
+  //       },
+  //       data,
+  //     });
+  //     return updateContact;
+  //   } catch (error) {
+  //     console.log({ updateContactError: error });
+  //     return error;
+  //   }
+  // }
 
-  public async getOneById(bannerId: number): Promise<Contact> {
+  public async getOneById(contactId: number): Promise<Contact> {
     try {
-      const foundBannerById = await this.prisma.contact.findFirst({
+      const foundContactById = await this.prisma.contact.findFirst({
         where: {
-          id: bannerId,
+          id: contactId,
           deletedAt: null,
           deletedFlg: false,
         },
       });
-      return foundBannerById;
+      return foundContactById;
     } catch (error) {
-      console.log({ foundBannerByIdError: error });
+      console.log({ foundContactByIdError: error });
       return error;
     }
   }
 
-  public async softDeleteOneById(bannerId: number): Promise<Contact> {
+  public async softDeleteOneById(contactId: number): Promise<Contact> {
     try {
-      const foundBanner = await this.prisma.contact.findFirst({
+      const foundContact = await this.prisma.contact.findFirst({
         where: {
-          id: bannerId,
+          id: contactId,
         },
       });
-      if (!foundBanner) {
+      if (!foundContact) {
         throw new BadRequestException(EXCEPTION_CONTACT.CONTACT_NOT_FOUND);
       }
 
-      const softDeleteBannerById = await this.prisma.contact.update({
+      const softDeleteContactById = await this.prisma.contact.update({
         where: {
-          id: bannerId,
+          id: contactId,
         },
         data: {
           deletedFlg: true,
           deletedAt: new Date(),
         },
       });
-      return softDeleteBannerById;
+      return softDeleteContactById;
     } catch (error) {
-      console.log({ softDeleteBannerByIdError: error });
+      console.log({ softDeleteContactByIdError: error });
       return error;
     }
   }
@@ -145,7 +145,7 @@ export class ContactsService {
   public async softDeleteMultiple(payload: DeleteMultipleDto): Promise<any> {
     try {
       const { ids } = payload;
-      const softDeleteMultipleBanners = await this.prisma.contact.updateMany({
+      const softDeleteMultipleContacts = await this.prisma.contact.updateMany({
         where: { id: { in: ids } },
         data: {
           deletedFlg: true,
@@ -153,9 +153,9 @@ export class ContactsService {
         },
       });
 
-      return softDeleteMultipleBanners;
+      return softDeleteMultipleContacts;
     } catch (error) {
-      console.log({ softDeleteMultipleBannerByIdArrayError: error });
+      console.log({ softDeleteMultipleContactByIdArrayError: error });
       return error;
     }
   }
@@ -163,7 +163,7 @@ export class ContactsService {
   public async restoreMultiple(payload: RestoreMultipleDto): Promise<any> {
     try {
       const { ids } = payload;
-      const restoreMultipleBanners = await this.prisma.contact.updateMany({
+      const restoreMultipleContacts = await this.prisma.contact.updateMany({
         where: { id: { in: ids } },
         data: {
           deletedFlg: false,
@@ -171,67 +171,67 @@ export class ContactsService {
         },
       });
 
-      return restoreMultipleBanners;
+      return restoreMultipleContacts;
     } catch (error) {
-      console.log({ restoreMultipleBannerByIdArrayError: error });
+      console.log({ restoreMultipleContactByIdArrayError: error });
       return error;
     }
   }
 
-  public async restoreOneContact(bannerId: number): Promise<Contact> {
+  public async restoreOneContact(contactId: number): Promise<Contact> {
     try {
-      const foundBanner = await this.prisma.contact.findFirst({
+      const foundContact = await this.prisma.contact.findFirst({
         where: {
-          id: bannerId,
+          id: contactId,
           deletedFlg: true,
         },
       });
-      if (!foundBanner) {
+      if (!foundContact) {
         throw new BadRequestException(EXCEPTION_CONTACT.CONTACT_NOT_FOUND);
       }
 
-      const restoreBannerById = await this.prisma.contact.update({
+      const restoreContactById = await this.prisma.contact.update({
         where: {
-          id: bannerId,
+          id: contactId,
         },
         data: {
           deletedFlg: false,
           deletedAt: null,
         },
       });
-      return restoreBannerById;
+      return restoreContactById;
     } catch (error) {
-      console.log({ restoreBannerByIdError: error });
+      console.log({ restoreContactByIdError: error });
       return error;
     }
   }
 
   public async forceDeleteOneById(
-    bannerId: number,
+    contactId: number,
     payload: IsDeleteImageDto,
   ): Promise<Contact> {
     try {
-      const foundBanner = await this.prisma.contact.findFirst({
+      const foundContact = await this.prisma.contact.findFirst({
         where: {
-          id: bannerId,
+          id: contactId,
         },
       });
-      if (!foundBanner) {
+      if (!foundContact) {
         throw new BadRequestException(EXCEPTION_CONTACT.CONTACT_NOT_FOUND);
       }
 
       //   if (payload?.isDeleteImage) {
-      //     await fs.promises.unlink(`./src/public/${foundBanner.url}`);
+      //     await fs.promises.unlink(`./src/public/${foundContact.url}`);
       //   }
 
-      const forceDeleteBannerById = await this.prisma.contact.delete({
+      const forceDeleteContactById = await this.prisma.contact.delete({
         where: {
-          id: bannerId,
+          id: contactId,
         },
       });
-      return forceDeleteBannerById;
+      return forceDeleteContactById;
     } catch (error) {
-      console.log({ forceDeleteBannerByIdError: error });
+      console.log({ forceDeleteContactByIdError: error });
       return error;
     }
   }
@@ -240,7 +240,7 @@ export class ContactsService {
   public async forceDeleteMultiple(payload: DeleteMultipleDto): Promise<any> {
     try {
       const { ids } = payload;
-      const softDeleteMultipleBanners = await this.prisma.contact.updateMany({
+      const softDeleteMultipleContacts = await this.prisma.contact.updateMany({
         where: { id: { in: ids } },
         data: {
           deletedFlg: true,
@@ -248,9 +248,9 @@ export class ContactsService {
         },
       });
 
-      return softDeleteMultipleBanners;
+      return softDeleteMultipleContacts;
     } catch (error) {
-      console.log({ softDeleteMultipleBannerByIdArrayError: error });
+      console.log({ softDeleteMultipleContactByIdArrayError: error });
       return error;
     }
   }
