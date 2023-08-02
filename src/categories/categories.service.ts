@@ -29,7 +29,7 @@ export class CategoriesService {
         skip: offset,
         take: limit,
         include: {
-          SubCategory: true,
+          subCategory: true,
         },
       });
 
