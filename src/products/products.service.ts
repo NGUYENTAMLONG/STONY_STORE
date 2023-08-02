@@ -20,11 +20,25 @@ export class ProductsService {
     }
   }
 
+  public async findOneById(productId: number): Promise<Product> {
+    try {
+      return this.prisma.product.findFirst({
+        where: {
+          id: productId,
+          deletedAt: null,
+          deletedFlg: false,
+        },
+      });
+    } catch (error) {
+      console.log({ productFindOnebyIdError: error });
+      return error;
+    }
+  }
+
   public async createOneProduct(
     payload: CreateProductDto,
-    variant?: any,
-  ) // : Promise<Product>
-  {
+    variant?: any, // : Promise<Product>
+  ) {
     // try {
     //   const {
     //     name,
@@ -58,5 +72,61 @@ export class ProductsService {
     //   console.log({ createProductError: error });
     //   return error;
     // }
+  }
+
+  public async softDeleteOne(productId: number): Promise<any> {
+    try {
+      //Check Order has product ?
+      //Check Category/Subcategory has product ?
+      //Check Event has product ?
+      const softDeletedProduct = await this.prisma.user.update({
+        where: {
+          id: productId,
+        },
+        data: {
+          deletedAt: new Date(),
+          deletedFlg: true,
+        },
+      });
+      return softDeletedProduct;
+    } catch (error) {
+      console.log({ softDeletedError: error });
+      return error;
+    }
+  }
+  public async restoreOne(productId: number): Promise<any> {
+    try {
+      //Check Order has product ?
+      //Check Category/Subcategory has product ?
+      //Check Event has product ?
+      const restoreProduct = await this.prisma.product.update({
+        where: {
+          id: productId,
+        },
+        data: {
+          deletedAt: null,
+          deletedFlg: false,
+        },
+      });
+      return restoreProduct;
+    } catch (error) {
+      console.log({ restoreError: error });
+      return error;
+    }
+  }
+
+  public async forceDeleteOne(productId: number): Promise<any> {
+    try {
+      // note check cascade
+      const forceDeletedUser = await this.prisma.product.delete({
+        where: {
+          id: productId,
+        },
+      });
+      return forceDeletedUser;
+    } catch (error) {
+      console.log({ forceDeleteError: error });
+      return error;
+    }
   }
 }

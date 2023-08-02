@@ -29,7 +29,7 @@ export class CategoriesService {
         skip: offset,
         take: limit,
         include: {
-          SubCategory: true,
+          subCategory: true,
         },
       });
 
@@ -125,7 +125,7 @@ export class CategoriesService {
         where: {
           id: Number(parentCategory),
         },
-        data: { SubCategory: { connect: { id: createCategory.id } } },
+        data: { subCategory: { connect: { id: createCategory.id } } },
       });
 
       return createCategory;

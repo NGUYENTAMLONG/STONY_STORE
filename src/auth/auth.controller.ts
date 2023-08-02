@@ -1,8 +1,16 @@
-import { Body, Controller, Post, UnauthorizedException } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Req,
+  Res,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dtos/login.dto';
 // import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { EXCEPTION_AUTH } from './constants/auth.constant';
+import { Response } from 'express';
 
 // @ApiTags('auth')
 // @Controller({ version: ['1'], path: 'auth' })
@@ -11,7 +19,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
-//   @ApiOperation({ summary: 'Login' })
+  //   @ApiOperation({ summary: 'Login' })
   public async login(@Body() body: LoginDto) {
     const {
       username,
@@ -34,8 +42,17 @@ export class AuthController {
     // }
 
     if (!user) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException(EXCEPTION_AUTH.WRONG_PASSWORD);
     }
     return this.authService.login(user);
+  }
+
+  @Post('logout')
+  async logout(
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<{ success: true }> {
+    await this.authService.logout(request, response);
+    return { success: true };
   }
 }

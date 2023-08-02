@@ -406,6 +406,7 @@ model Contact {
     email      String?
     title      String                  @db.Text
     content    String                  @db.Text
+    image      String?
     status     ContactProcessingStatus @default(WAITING)
     Type       ContactType             @default(EXCHANGE)
     createdAt  DateTime                @default(now())

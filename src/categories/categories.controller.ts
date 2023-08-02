@@ -127,6 +127,28 @@ export class CategoriesController {
     );
   }
 
+  @Patch(':id')
+  @UseInterceptors(
+    FileInterceptor('thumbnail', {
+      storage: diskStorage({
+        destination: './src/public/images/categories',
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  public async updateSubCategory(
+    // @Param('id') categoryId: number,
+    @Param('id', new ParseIntPipe({ optional: true })) categoryId: number,
+    @Body() payload: UpdateCategoryDto,
+    @UploadedFile() thumbnail?: Express.Multer.File,
+  ) {
+    return this.categoriesService.updateOneCategory(
+      categoryId,
+      payload,
+      thumbnail,
+    );
+  }
   @Delete('/soft-delete/:id')
   public async softDeleteCategory(
     @Param('id', new ParseIntPipe({ optional: true })) categoryId: number,
