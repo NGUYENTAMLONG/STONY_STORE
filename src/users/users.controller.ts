@@ -8,6 +8,7 @@ import {
   Patch,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
@@ -16,12 +17,14 @@ import {
   UserIdArrayDto,
 } from './dtos/users.dto';
 import { UpdateProfileDto } from './dtos/profile.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get('')
+  @UseGuards(JwtAuthGuard)
   public async getUserList(
     @Query('page', new ParseIntPipe({ optional: true })) page: number = 1,
     @Query('limit', new ParseIntPipe({ optional: true })) limit: number = 10,
