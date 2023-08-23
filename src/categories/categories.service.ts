@@ -11,7 +11,7 @@ import {
   IsDeleteImageDto,
   RestoreMultipleDto,
 } from './dtos/categories.dto';
-import { EXCEPTION_CATEGORY } from './contants/category.constant';
+import { EXCEPTION_CATEGORY } from './constants/category.constant';
 import * as fs from 'fs';
 
 @Injectable()
@@ -63,7 +63,30 @@ export class CategoriesService {
       return error;
     }
   }
-
+  public async getProductsByCategoryId(
+    categoryId: number,
+    page: number,
+    limit: number,
+  ): Promise<any> {
+    try {
+      const offset = (page - 1) * limit;
+      const foundProducts = await this.prisma.category.findFirst({
+        where: {
+          id: categoryId,
+        },
+        include: {
+          products: {
+            skip: offset,
+            take: limit,
+          },
+        },
+      });
+      return foundProducts;
+    } catch (error) {
+      console.log({ subCategoryListError: error });
+      return error;
+    }
+  }
   public async createOneCategory(
     payload: CreateCategoryDto,
     thumbnail?: Express.Multer.File,

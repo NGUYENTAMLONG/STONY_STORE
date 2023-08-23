@@ -13,7 +13,7 @@ import {
   UpdateBannerDto,
   UploadFileDto,
 } from './dtos/banners.dto';
-import { EXCEPTION_BANNER } from './contants/banner.constant';
+import { EXCEPTION_BANNER } from './constants/banner.constant';
 import * as fs from 'fs';
 
 @Injectable()

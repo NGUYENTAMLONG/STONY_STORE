@@ -7,7 +7,7 @@ import {
   IsDeleteImageDto,
   RestoreMultipleDto,
 } from './dtos/contacts.dto';
-import { EXCEPTION_CONTACT } from './contants/contact.constant';
+import { EXCEPTION_CONTACT } from './constants/contact.constant';
 
 @Injectable()
 export class ContactsService {

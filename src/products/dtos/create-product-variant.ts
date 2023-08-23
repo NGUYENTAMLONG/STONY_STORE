@@ -3,29 +3,29 @@ import {
   IsBoolean,
   IsNotEmpty,
   IsNumber,
+  IsNumberString,
   IsOptional,
   IsString,
 } from 'class-validator';
 
 export class CreateProductVariantDto {
-  @IsNumber()
+  @IsNumberString()
   @IsOptional()
   sizeId?: number;
 
-  @IsNumber()
+  @IsNumberString()
   @IsOptional()
   colorId?: number;
 
-  @IsNumber()
+  @IsNumberString()
   @IsOptional()
   stock?: number;
 
-  @IsNumber()
+  @IsNumberString()
   @IsOptional()
   productId?: number;
 
-  @IsNumber()
+  @IsNumberString()
   @IsOptional()
   materialId?: number;
-  
 }

@@ -1,6 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
-
+//-----> History,... STT imageProducts
 generator client {
     provider = "prisma-client-js"
 }
@@ -11,26 +11,48 @@ datasource db {
 }
 
 model User {
-    id              Int       @id @default(autoincrement())
-    username        String    @unique
+    id              Int          @id @default(autoincrement())
+    username        String       @unique
     password        String
     userType        UserType
     cart            Cart?
     shippingAddress Address[]
     profile         Profile?
+    setting         UserSetting?
     isAdministrator Boolean
     roles           Role[]
+    lastLogin       DateTime?
+    lastLogout      DateTime?
     //
-    deletedFlg      Boolean   @default(false)
+    deletedFlg      Boolean      @default(false)
     deletedAt       DateTime?
     createdBy       Int?
-    createdAt       DateTime  @default(now())
+    createdAt       DateTime     @default(now())
     updatedBy       Int?
-    updatedAt       DateTime  @updatedAt
+    updatedAt       DateTime     @updatedAt
     metadata        Json?
     order           Order[]
     contact         Contact[]
     reviews         Review[]
+}
+
+model UserSetting {
+    id         Int        @id @default(autoincrement())
+    lastLogin  DateTime?
+    lastLogout DateTime?
+    darkMode   Boolean    @default(false)
+    themes     Themes?    @default(NONE)
+    language   Languages? @default(VIETNAMESE)
+    userId     Int        @unique
+    user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+    // 
+    deletedFlg Boolean    @default(false)
+    deletedAt  DateTime?
+    createdBy  Int?
+    createdAt  DateTime   @default(now())
+    updatedBy  Int?
+    updatedAt  DateTime   @updatedAt
+    metadata   Json?
 }
 
 model Role {
@@ -222,12 +244,13 @@ model Product {
     discount      Float?
     new           Boolean?
     hot           Boolean?
+    thumbnail     String?
     status        ProductStatus    @default(AVAILABLE)
     categoryId    Int
     category      Category         @relation(fields: [categoryId], references: [id], onDelete: Cascade)
     subCategoryId Int
     subCategory   SubCategory      @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
-    event         Event?           @relation(fields: [eventId], references: [id])
+    event         Event?           @relation(fields: [eventId], references: [id], onDelete: Cascade)
     eventId       Int?
     variants      ProductVariant[]
     images        ProductImage[]
@@ -313,8 +336,8 @@ model ProductVariant {
 
 model ProductImage {
     id         Int       @id @default(autoincrement())
-    productId  Int
     imageUrl   String
+    productId  Int
     product    Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
     metadata   Json?
     deletedFlg Boolean   @default(false)
@@ -474,4 +497,16 @@ enum ContactType {
     BUG
     EXCHANGE
     ANOTHER
+}
+
+enum Themes {
+    NONE
+    HOLLIDAY
+}
+
+enum Languages {
+    VIETNAMESE
+    ENGLISH
+    CHINESE
+    JAPANESE
 }

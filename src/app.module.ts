@@ -23,11 +23,13 @@ import { SizesModule } from './sizes/sizes.module';
 import { AddressesModule } from './addresses/addresses.module';
 import { VouchersModule } from './voucher/vouchers.module';
 import { EventsModule } from './events/events.module';
+import { RedisModule } from './redis/redis.module';
+
 @Module({
   imports: [
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', '/src/public'),
-    }),
+    }), /// ---> localhost:3000/images/thumbnail/name.jpg
     UsersModule,
     ProductsModule,
     InitializationsModule,
@@ -46,6 +48,7 @@ import { EventsModule } from './events/events.module';
     AddressesModule,
     VouchersModule,
     EventsModule,
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [

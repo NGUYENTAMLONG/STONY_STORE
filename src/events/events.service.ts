@@ -11,7 +11,7 @@ import {
   RestoreMultipleDto,
   UpdateEventDto,
 } from './dtos/events.dto';
-import { EXCEPTION_EVENT } from './contants/event.constant';
+import { EXCEPTION_EVENT } from './constants/event.constant';
 import * as fs from 'fs';
 @Injectable()
 export class EventsService {
