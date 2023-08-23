@@ -12,7 +12,7 @@ import {
   UpdateAddressDto,
 } from './dtos/addresses.dto';
 import * as fs from 'fs';
-import { EXCEPTION_ADDRESS } from './contants/address.constant';
+import { EXCEPTION_ADDRESS } from './constants/address.constant';
 
 @Injectable()
 export class AddressesService {

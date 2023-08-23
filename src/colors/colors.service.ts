@@ -8,7 +8,7 @@ import {
   RestoreMultipleDto,
   UpdateColorDto,
 } from './dtos/colors.dto';
-import { EXCEPTION_COLOR } from './contants/color.constant';
+import { EXCEPTION_COLOR } from './constants/color.constant';
 @Injectable()
 export class ColorsService {
   constructor(private readonly prisma: PrismaClient) {}

@@ -8,51 +8,51 @@ import {
   IsString,
 } from 'class-validator';
 
-export class CreateProductDto {
+export class UpdateProductDto {
   @IsString()
-  @IsNotEmpty()
-  name: string;
-
-  @IsString()
-  @IsNotEmpty()
-  code: string;
-
-  @IsNumberString()
-  @IsNotEmpty()
-  price: number;
+  @IsOptional()
+  name?: string;
 
   @IsString()
   @IsOptional()
-  description: string;
+  code?: string;
 
   @IsNumberString()
   @IsOptional()
-  importPrice: number;
+  price?: number;
+
+  @IsString()
+  @IsOptional()
+  description?: string;
 
   @IsNumberString()
   @IsOptional()
-  tax: number;
+  importPrice?: number;
 
   @IsNumberString()
   @IsOptional()
-  discount: number;
+  tax?: number;
+
+  @IsNumberString()
+  @IsOptional()
+  discount?: number;
 
   @IsBoolean()
   @IsOptional()
   new?: boolean;
 
   @IsBooleanString()
-  @IsNotEmpty()
-  hot: boolean;
+  @IsOptional()
+  hot?: boolean;
 
   @IsNumberString()
-  @IsNotEmpty()
-  categoryId: number;
+  @IsOptional()
+  categoryId?: number;
 
   @IsNumberString()
-  @IsNotEmpty()
-  subCategoryId: number;
+  @IsOptional()
+  subCategoryId?: number;
 
-  // @IsNotEmpty()
-  // thumbnail: string;
+  // @IsOptional()
+  // thumbnail?: string;
 }

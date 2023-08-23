@@ -56,6 +56,24 @@ export class CategoriesController {
     };
   }
 
+  @Get(':id/products')
+  public async getProductsFromCategory(
+    @Param('id', new ParseIntPipe({ optional: true })) categoryId: number,
+    @Query('page', new ParseIntPipe({ optional: true })) page: number = 1,
+    @Query('limit', new ParseIntPipe({ optional: true })) limit: number = 10,
+  ) {
+    const result = await this.categoriesService.getProductsByCategoryId(
+      categoryId,
+      page,
+      limit,
+    );
+    return {
+      data: result,
+      page,
+      limit,
+    };
+  }
+
   @Get(':id')
   public async findCategory(
     @Param('id', new ParseIntPipe({ optional: true })) categoryId: number,

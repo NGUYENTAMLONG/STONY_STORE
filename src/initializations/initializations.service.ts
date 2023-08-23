@@ -7,7 +7,7 @@ import {
   COLORS,
   MATERIALS,
   SIZES,
-} from 'src/configs/contants.config';
+} from 'src/configs/constants.config';
 config();
 
 @Injectable()
@@ -19,7 +19,7 @@ export class InitializationsService implements OnModuleInit {
     await this.initialColors();
     await this.initialSizes();
     await this.initialMaterials();
-    // await this.initalCatgories();
+    await this.initalCatgories();
   }
 
   private async initialAdmin() {
@@ -120,36 +120,36 @@ export class InitializationsService implements OnModuleInit {
     try {
       const countExistedCategories = await this.prisma.category.count();
       const a = await this.prisma.subCategory.findMany({}); //
-      // if (countExistedCategories === 0) {
-      // for (const category of CATEGORIES) {
-      //   let createdCategory = await this.prisma.category.create({
-      //     data: {
-      //       name: category.name,
-      //       nameEN: category.nameEN,
-      //       description: category.description,
-      //     },
-      //   }); // category main
+      if (countExistedCategories === 0) {
+        for (const category of CATEGORIES) {
+          let createdCategory = await this.prisma.category.create({
+            data: {
+              name: category.name,
+              nameEN: category.nameEN,
+              description: category.description,
+            },
+          }); // category main
 
-      //   // if (category?.subCatgories.length > 0) {
-      //   //   for (const subCategory of category.subCatgories) {
-      //   //     console.log({
-      //   //       name: subCategory.name,
-      //   //       description: subCategory.description,
-      //   //       nameEN: subCategory.nameEN,
-      //   //       categoryId: createdCategory.id,
-      //   //     });
-      //   //     await this.prisma.subCategory.create({
-      //   //       data: {
-      //   //         name: subCategory.name,
-      //   //         description: subCategory.description,
-      //   //         nameEN: subCategory.nameEN,
-      //   //         categoryId: createdCategory.id,
-      //   //       },
-      //   //     }); //
-      //   //   }
-      //   // }
-      // }
-      // }
+          if (category?.subCatgories.length > 0) {
+            for (const subCategory of category.subCatgories) {
+              console.log({
+                name: subCategory.name,
+                description: subCategory.description,
+                nameEN: subCategory.nameEN,
+                categoryId: createdCategory.id,
+              });
+              await this.prisma.subCategory.create({
+                data: {
+                  name: subCategory.name,
+                  description: subCategory.description,
+                  nameEN: subCategory.nameEN,
+                  categoryId: createdCategory.id,
+                },
+              }); //
+            }
+          }
+        }
+      }
       console.log('👘👖👠👡👞 Initialized categories Successful !!! 👒🎩👟👢 ');
     } catch (error) {
       console.log({ initialCategoriesError: error });

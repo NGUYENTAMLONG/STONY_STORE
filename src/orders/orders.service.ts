@@ -12,7 +12,7 @@ import {
   RestoreMultipleDto,
   UpdateOrderDto,
 } from './dtos/orders.dto';
-import { EXCEPTION_ORDER } from './contants/order.constant';
+import { EXCEPTION_ORDER } from './constants/order.constant';
 import * as fs from 'fs';
 
 @Injectable()

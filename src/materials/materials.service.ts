@@ -8,7 +8,7 @@ import {
   RestoreMultipleDto,
   UpdateMaterialDto,
 } from './dtos/materials.dto';
-import { EXCEPTION_MATERIAL } from './contants/material.constant';
+import { EXCEPTION_MATERIAL } from './constants/material.constant';
 
 @Injectable()
 export class MaterialsService {
