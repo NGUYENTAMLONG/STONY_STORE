@@ -7,6 +7,7 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
 import { UsersModule } from 'src/users/users.module';
 import { config } from 'dotenv';
 import { PrismaClient } from '@prisma/client';
+import { MailerService } from 'src/mailer/mailer.service';
 config();
 
 @Module({
@@ -18,7 +19,7 @@ config();
     }),
     UsersModule,
   ],
-  providers: [JwtStrategy, AuthService,PrismaClient],
+  providers: [JwtStrategy, AuthService, PrismaClient, MailerService],
   controllers: [AuthController],
   exports: [AuthService],
 })

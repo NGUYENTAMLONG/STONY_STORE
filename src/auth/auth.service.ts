@@ -12,6 +12,9 @@ import { PrismaClient, User } from '@prisma/client';
 import { Response } from 'express';
 import { config } from 'dotenv';
 import { EXCEPTION_USER } from 'src/users/constants/user.contant';
+import { RegisterDto } from './dtos/register.dto';
+import { MailerService } from 'src/mailer/mailer.service';
+import { EXCEPTION_AUTH } from './constants/auth.constant';
 config();
 
 @Injectable()
@@ -20,6 +23,7 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly prisma: PrismaClient,
+    private readonly mailerService: MailerService,
   ) {}
   async validateUserByUsername(
     username: string,
@@ -62,7 +66,82 @@ export class AuthService {
       accessToken: this.jwtService.sign(payload),
     };
   }
-
+  async register(payload: RegisterDto): Promise<any> {
+    try {
+      const { email, username, password } = payload;
+      //check existed username or email
+      const checkExistedEmail = await this.prisma.profile.findFirst({
+        where: {
+          email,
+        },
+      });
+      const checkExistedUsername = await this.prisma.user.findFirst({
+        where: {
+          username: username,
+        },
+      });
+      if (checkExistedEmail) {
+        throw new BadRequestException(EXCEPTION_AUTH.EMAIL_EXISTED);
+      }
+      if (checkExistedUsername) {
+        throw new BadRequestException(EXCEPTION_AUTH.USERNAME_EXISTED);
+      }
+      //Check validate password ...
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const createUser = await this.prisma.user.create({
+        data: {
+          username,
+          password: hashedPassword,
+          userType: 'CUSTOMER',
+          isAdministrator: false,
+        },
+      });
+      await this.mailerService.sendVerifyEmail(createUser.id, email, username);
+      return { status: 200, message: 'Welcome email sent successfully' };
+    } catch (error) {
+      console.log('error hehehehehe');
+    }
+  }
+  async verifyJwt(jwtVerify: string): Promise<any> {
+    try {
+      const result = this.jwtService.verify(jwtVerify, {
+        secret: process.env.TOKEN_SECRET,
+      });
+      const { userId, email } = result;
+      const setActiveAccount = await this.prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          isActive: true,
+        },
+      });
+      const createEmailProfile = await this.prisma.profile.create({
+        data: {
+          firstName: '',
+          lastName: '',
+          email,
+          userId: Number(userId),
+        },
+      });
+      const createSetting = await this.prisma.userSetting.create({
+        data: {
+          userId,
+        },
+      });
+      const createCart = await this.prisma.cart.create({
+        data: {
+          userId,
+        },
+      });
+      return { status: 201, message: 'SETUP SUCCESSFUL' };
+    } catch (error) {
+      console.log(error);
+      if (error.name === 'TokenExpiredError') {
+        throw new BadRequestException(EXCEPTION_AUTH.TOKEN_EXPIRED_VERIFY);
+      }
+    }
+  }
   private encode(user: User) {
     const access_token = this.generateToken(user);
 

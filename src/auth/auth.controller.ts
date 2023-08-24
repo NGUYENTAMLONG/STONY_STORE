@@ -1,6 +1,8 @@
 import {
   Body,
   Controller,
+  Get,
+  Param,
   Post,
   Req,
   Res,
@@ -11,6 +13,7 @@ import { LoginDto } from './dtos/login.dto';
 // import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { EXCEPTION_AUTH } from './constants/auth.constant';
 import { Response } from 'express';
+import { RegisterDto } from './dtos/register.dto';
 
 // @ApiTags('auth')
 // @Controller({ version: ['1'], path: 'auth' })
@@ -47,12 +50,22 @@ export class AuthController {
     return this.authService.login(user);
   }
 
-  @Post('logout')
-  async logout(
-    @Req() request: Request,
-    @Res({ passthrough: true }) response: Response,
-  ): Promise<{ success: true }> {
-    await this.authService.logout(request, response);
-    return { success: true };
+  // @Post('logout')
+  // async logout(
+  //   @Req() request: Request,
+  //   @Res({ passthrough: true }) response: Response,
+  // ): Promise<{ success: true }> {
+  //   await this.authService.logout(request, response);
+  //   return { success: true };
+  // }
+
+  @Post('register')
+  async register(@Body() payload: RegisterDto): Promise<any> {
+    return this.authService.register(payload);
+  }
+
+  @Get('verify/:jwt')
+  async verifyAccount(@Param('jwt') jwtVerify: string): Promise<any> {
+    return this.authService.verifyJwt(jwtVerify);
   }
 }

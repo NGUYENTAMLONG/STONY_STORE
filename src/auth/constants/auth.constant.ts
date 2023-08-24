@@ -1,6 +1,6 @@
 export const EXCEPTION_AUTH = {
   WRONG_ACCOUNT: {
-    message: 'EMAIL_OR_USERNAME_IS_INCORRECT',
+    message: 'EMAIL OR USERNAME IS INCORRECT',
     code: 'auth001',
   },
 
@@ -15,7 +15,22 @@ export const EXCEPTION_AUTH = {
   },
 
   UNDEFINED_EMAIL_USERNAME: {
-    message: 'EMAIL_OR_USERNAME_UNDEFINED',
+    message: 'EMAIL OR USERNAME UNDEFINED',
     code: 'auth004',
+  },
+
+  TOKEN_EXPIRED_VERIFY: {
+    message: 'TOKEN EXPIRED VERIFY',
+    code: 'auth005',
+  },
+
+  EMAIL_EXISTED: {
+    message: 'EMAIL EXISTED',
+    code: 'auth006',
+  },
+
+  USERNAME_EXISTED: {
+    message: 'USERNAME EXISTED',
+    code: 'auth007',
   },
 };

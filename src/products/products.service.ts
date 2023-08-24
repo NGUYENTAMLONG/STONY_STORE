@@ -68,7 +68,7 @@ export class ProductsService {
         },
       });
     } catch (error) {
-      console.log({ productFindVariantbyIdError: error });
+      console.log({ findVariantbyIdError: error });
       return error;
     }
   }
@@ -247,10 +247,11 @@ export class ProductsService {
       if (!foundProduct) {
         throw new BadRequestException(EXCEPTION_PRODUCT.PRODUCT_NOT_FOUND);
       }
-      const dataUploads = imageDetails.map((img) => {
+      const dataUploads = imageDetails.map((img, index) => {
         return {
           imageUrl: `/images/details/${img.filename}`,
           productId: Number(productId),
+          orderIndex: index + 1,
         };
       });
       const updateDetailImages = await this.prisma.productImage.createMany({
@@ -417,7 +418,7 @@ export class ProductsService {
         });
       return forceDeletedDetailImages;
     } catch (error) {
-      console.log({ forceDeleteError: error });
+      console.log({ forceDeleteDetailImagesError: error });
       return error;
     }
   }
