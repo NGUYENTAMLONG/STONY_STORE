@@ -33,4 +33,29 @@ export const EXCEPTION_AUTH = {
     message: 'USERNAME EXISTED',
     code: 'auth007',
   },
+
+  EMAIL_DOES_NOT_EXISTED: {
+    message: 'EMAIL DOES NOT EXISTED',
+    code: 'auth008',
+  },
+
+  USER_DOES_NOT_EXISTED: {
+    message: 'USER DOES NOT EXISTED',
+    code: 'auth009',
+  },
+
+  USER_EXISTED: {
+    message: 'USER EXISTED',
+    code: 'auth010',
+  },
+
+  PASSWORD_DOES_NOT_MATCH_CONFIRM_PASSWORD: {
+    message: 'PASSWORD DOES NOT MATCH THE CONFIRM PASSWORD',
+    code: 'auth011',
+  },
+
+  INVALID_TOKEN: {
+    message: 'INVALIDTOKEN',
+    code: 'auth012',
+  },
 };

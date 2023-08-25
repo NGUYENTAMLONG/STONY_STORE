@@ -44,7 +44,7 @@ export class InitializationsService implements OnModuleInit {
             password: hashedPassword,
             userType: 'ADMIN',
             isAdministrator: true,
-            // isActive: true,
+            isActive: true,
           },
         });
         console.log('🌻🌻🌻 Initialized Successful !!! 🍔🍔🍔');

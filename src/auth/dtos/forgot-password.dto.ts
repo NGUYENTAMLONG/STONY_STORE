@@ -1,21 +1,21 @@
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
-export class RegisterDto {
+export class ForgotPassworDto {
   @IsNotEmpty()
   @IsEmail()
   email: string;
-
-  @IsNotEmpty()
-  @IsString()
-  username: string;
-
-  @IsNotEmpty()
-  @IsString()
-  password: string;
 }
 
-export class VerifyAgainDto {
+export class RecoverPassworDto {
   @IsNotEmpty()
-  @IsEmail()
-  email: string;
+  @IsString()
+  newPassword: string;
+
+  @IsNotEmpty()
+  @IsString()
+  verifyPassword: string;
+
+  @IsNotEmpty()
+  @IsString()
+  jwt: string;
 }
