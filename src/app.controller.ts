@@ -9,4 +9,19 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
+
+  @Get('/route-for-admin')
+  getForAdmin(): string {
+    return 'PASSED (ADMIN)';
+  }
+
+  @Get('/route-for-staff')
+  getForStaff(): string {
+    return 'PASSED (STAFF)';
+  }
+
+  @Get('/route-for-customer')
+  getForCustomer(): string {
+    return 'PASSED (CUSTOMER)';
+  }
 }

@@ -15,11 +15,22 @@ import { OrdersModule } from './orders/orders.module';
 import { CartsModule } from './carts/carts.module';
 import { OrderItemsModule } from './order-items/order-items.module';
 import { CartItemsModule } from './cart-items/cart-items.module';
+import { BannersModule } from './banners/banners.module';
+import { CategoriesModule } from './categories/categories.module';
+import { MaterialsModule } from './materials/materials.module';
+import { ContactsModule } from './contacts/contacts.module';
+import { SizesModule } from './sizes/sizes.module';
+import { AddressesModule } from './addresses/addresses.module';
+import { VouchersModule } from './voucher/vouchers.module';
+import { EventsModule } from './events/events.module';
+import { RedisModule } from './redis/redis.module';
+import { MailerService } from './mailer/mailer.service';
+
 @Module({
   imports: [
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', '/src/public'),
-    }),
+    }), /// ---> localhost:3000/images/thumbnail/name.jpg
     UsersModule,
     ProductsModule,
     InitializationsModule,
@@ -30,6 +41,15 @@ import { CartItemsModule } from './cart-items/cart-items.module';
     CartsModule,
     OrderItemsModule,
     CartItemsModule,
+    BannersModule,
+    CategoriesModule,
+    MaterialsModule,
+    ContactsModule,
+    SizesModule,
+    AddressesModule,
+    VouchersModule,
+    EventsModule,
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [
@@ -38,6 +58,7 @@ import { CartItemsModule } from './cart-items/cart-items.module';
       provide: APP_GUARD,
       useClass: AuthorizationGuard,
     },
+    MailerService,
   ],
 })
 export class AppModule {}

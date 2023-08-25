@@ -1,20 +1,34 @@
 import {
+  BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
   ParseIntPipe,
   Post,
+  Put,
   Query,
+  UploadedFile,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { CreateProductDto } from './dtos/create-product.dto';
-
+import { diskStorage } from 'multer';
+import { imageFileFilter } from 'src/validators/validation-file';
+import { editFileName } from 'src/helpers/file.helper';
+import { CreateProductVariantDto } from './dtos/create-product-variant';
+import { Variant, VariantParamDto } from './dtos/search-product.dto';
+import { UpdateProductDto } from './dtos/update-product.dto';
+import { DeleteDetailImagesDto } from './dtos/delete.dtos';
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Get()
-  public async getUserList(
+  public async getList(
     @Query('page', new ParseIntPipe({ optional: true })) page: number = 1,
     @Query('limit', new ParseIntPipe({ optional: true })) limit: number = 10,
   ) {
@@ -26,8 +40,132 @@ export class ProductsController {
     };
   }
 
-  @Post()
-  public async createProduct(@Body() payload: CreateProductDto, variant?: any) {
-    return this.productsService.createOneProduct(payload, variant);
+  @Get(':id')
+  public async findOneById(
+    @Param('id', new ParseIntPipe({ optional: true })) id: number,
+  ) {
+    const product = await this.productsService.findOneById(id);
+    return product;
   }
+
+  @Get(':id/:variant')
+  public async findVariantByProduct(
+    @Param('id', new ParseIntPipe({ optional: true })) id: number,
+    @Param('variant') variant?: Variant,
+  ) {
+    const result = await this.productsService.findVariantOfProduct(id, variant);
+    return result;
+  }
+
+  @Post()
+  @UseInterceptors(
+    FileInterceptor('thumbnail', {
+      // Enable file size limits
+      limits: {
+        fileSize: 50000, //+process.env.MAX_FILE_SIZE,
+      },
+      fileFilter: imageFileFilter,
+      storage: diskStorage({
+        destination: './src/public/images/thumbnails',
+        filename: editFileName,
+      }),
+    }),
+    // FilesInterceptor('files', 7, {
+    //   fileFilter: imageFileFilter,
+    //   limits: {
+    //     fileSize: 20000, //+process.env.MAX_FILE_SIZE,
+    //   },
+    //   storage: diskStorage({
+    //     destination: './src/public/images/details',
+    //     filename: editFileName,
+    //   }),
+    // }),
+  )
+  public async createProduct(
+    @Body() payload: CreateProductDto,
+    @UploadedFile() thumbnail: Express.Multer.File,
+    @Body() variants?: CreateProductVariantDto[],
+  ) {
+    return this.productsService.createOneProduct(payload, thumbnail, variants);
+  }
+
+  @Post('/:id/upload-detail-images')
+  @UseInterceptors(
+    FilesInterceptor('imageDetails', 7, {
+      fileFilter: imageFileFilter,
+      limits: {
+        fileSize: 50000, //+process.env.MAX_FILE_SIZE,
+      },
+      storage: diskStorage({
+        destination: './src/public/images/details',
+        filename: editFileName,
+      }),
+    }),
+  )
+  public async createProductImageDetails(
+    @Param('id', new ParseIntPipe({ optional: true })) id: number,
+    @UploadedFiles() imageDetails: Express.Multer.File[],
+  ) {
+    return this.productsService.uploadDetailImages(id, imageDetails);
+  }
+
+  @Post('/:id/create-variants')
+  public async createProductVariants(
+    @Param('id', new ParseIntPipe({ optional: true })) productId: number,
+    @Body() variants: CreateProductVariantDto[],
+  ) {
+    return this.productsService.createProductVariants(productId, variants);
+  }
+
+  @Delete('/soft-delete/:id')
+  public async softDeleteProduct(@Param('id') id: number) {
+    const result = await this.productsService.softDeleteOne(id);
+    return result;
+  }
+
+  @Delete('/force-delete/:id')
+  public async forceDeleteProduct(@Param('id') id: number) {
+    const result = await this.productsService.forceDeleteOne(id);
+    return result;
+  }
+
+  @Put(':id')
+  @UseInterceptors(
+    FileInterceptor('thumbnail', {
+      // Enable file size limits
+      limits: {
+        fileSize: 20000, //+process.env.MAX_FILE_SIZE,
+      },
+      fileFilter: imageFileFilter,
+      storage: diskStorage({
+        destination: './src/public/images/thumbnails',
+        filename: editFileName,
+      }),
+    }),
+  )
+  public async updateProduct(
+    @Param('id', new ParseIntPipe({ optional: true })) productId: number,
+    @Body() payload: UpdateProductDto,
+    @UploadedFile() thumbnail?: Express.Multer.File,
+    // @Body() variants?: CreateProductVariantDto[],
+  ) {
+    return this.productsService.updateOneProduct(productId, payload, thumbnail);
+  }
+
+  @Delete('/delete-detail-images')
+  public async DeleteProductDetailImages(
+    @Body() payload: DeleteDetailImagesDto,
+  ) {
+    return this.productsService.deleteImageDetails(payload);
+  }
+  // @Delete('/soft-delete-many')
+  // public async softDeleteProducts(@Body() payload: UserIdArrayDto) {
+  //   const result = await this.productsService.softDeleteMultiple(payload);
+  //   return result;
+  // }
+  // @Delete('/force-delete-many')
+  // public async forceDeleteProducts(@Body() payload: UserIdArrayDto) {
+  //   const result = await this.productsService.forceDeleteMultiple(payload);
+  //   return result;
+  // }
 }

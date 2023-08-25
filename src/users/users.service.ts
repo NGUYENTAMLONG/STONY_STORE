@@ -13,6 +13,7 @@ import { UpdateProfileDto } from './dtos/profile.dto';
 import { EXCEPTION_USER } from './constants/user.contant';
 import * as bcrypt from 'bcrypt';
 import { config } from 'dotenv';
+import { UpdateSettingDto } from './dtos/setting.dto';
 config();
 @Injectable()
 export class UsersService {
@@ -132,6 +133,30 @@ export class UsersService {
       return error;
     }
   }
+
+  public async updateSetting(
+    userSettingId: number,
+    payload: UpdateSettingDto,
+  ): Promise<any> {
+    try {
+      const { darkMode, languages, themes } = payload;
+      const updatedUserSetting = await this.prisma.userSetting.update({
+        where: {
+          id: userSettingId,
+        },
+        data: {
+          darkMode,
+          language: languages[languages],
+          themes: themes[themes],
+        },
+      });
+      return updatedUserSetting;
+    } catch (error) {
+      console.log({ updatedUserSettingError: error });
+      return error;
+    }
+  }
+
   public async changePassword(
     userId: number,
     payload: ChangePasswordDto,

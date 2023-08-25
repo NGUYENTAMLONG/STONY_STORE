@@ -7,7 +7,7 @@ import {
   COLORS,
   MATERIALS,
   SIZES,
-} from 'src/configs/contants.config';
+} from 'src/configs/constants.config';
 config();
 
 @Injectable()
@@ -19,7 +19,7 @@ export class InitializationsService implements OnModuleInit {
     await this.initialColors();
     await this.initialSizes();
     await this.initialMaterials();
-    // await this.initalCatgories();
+    await this.initalCatgories();
   }
 
   private async initialAdmin() {
@@ -29,6 +29,7 @@ export class InitializationsService implements OnModuleInit {
           userType: 'ADMIN',
         },
       });
+
       if (!foundExistedAdmin) {
         const usernameAdmin = process.env.USERNAME_ADMIN;
         const passwordAdmin = process.env.PASSWORD_ADMIN;
@@ -43,10 +44,11 @@ export class InitializationsService implements OnModuleInit {
             password: hashedPassword,
             userType: 'ADMIN',
             isAdministrator: true,
+            isActive: true,
           },
         });
+        console.log('🌻🌻🌻 Initialized Successful !!! 🍔🍔🍔');
       }
-      console.log('🌻🌻🌻 Initialized Successful !!! 🍔🍔🍔');
     } catch (error) {
       console.log({ initialAdminError: error });
       return error;
@@ -67,8 +69,8 @@ export class InitializationsService implements OnModuleInit {
             },
           });
         }
+        console.log('❤️💛💚 Initialized Colors Successful !!! 💙💜🖤');
       }
-      console.log('❤️💛💚 Initialized Colors Successful !!! 💙💜🖤');
     } catch (error) {
       console.log({ initialColorsError: error });
       return error;
@@ -87,8 +89,8 @@ export class InitializationsService implements OnModuleInit {
             },
           });
         }
+        console.log('🐡🐬🐢 Initialized Sizes Successful !!! 🐊😻🐘');
       }
-      console.log('🐡🐬🐢 Initialized Sizes Successful !!! 🐊😻🐘');
     } catch (error) {
       console.log({ initialSizesError: error });
       return error;
@@ -109,8 +111,8 @@ export class InitializationsService implements OnModuleInit {
             },
           });
         }
+        console.log('🐡🐬🐢 Initialized materials Successful !!! 🐊😻🐘');
       }
-      console.log('🐡🐬🐢 Initialized materials Successful !!! 🐊😻🐘');
     } catch (error) {
       console.log({ initialMaterialsError: error });
       return error;
@@ -120,36 +122,36 @@ export class InitializationsService implements OnModuleInit {
     try {
       const countExistedCategories = await this.prisma.category.count();
       const a = await this.prisma.subCategory.findMany({}); //
-      // if (countExistedCategories === 0) {
-      // for (const category of CATEGORIES) {
-      //   let createdCategory = await this.prisma.category.create({
-      //     data: {
-      //       name: category.name,
-      //       nameEN: category.nameEN,
-      //       description: category.description,
-      //     },
-      //   }); // category main
+      if (countExistedCategories === 0) {
+        for (const category of CATEGORIES) {
+          let createdCategory = await this.prisma.category.create({
+            data: {
+              name: category.name,
+              nameEN: category.nameEN,
+              description: category.description,
+            },
+          }); // category main
 
-      //   // if (category?.subCatgories.length > 0) {
-      //   //   for (const subCategory of category.subCatgories) {
-      //   //     console.log({
-      //   //       name: subCategory.name,
-      //   //       description: subCategory.description,
-      //   //       nameEN: subCategory.nameEN,
-      //   //       categoryId: createdCategory.id,
-      //   //     });
-      //   //     await this.prisma.subCategory.create({
-      //   //       data: {
-      //   //         name: subCategory.name,
-      //   //         description: subCategory.description,
-      //   //         nameEN: subCategory.nameEN,
-      //   //         categoryId: createdCategory.id,
-      //   //       },
-      //   //     }); //
-      //   //   }
-      //   // }
-      // }
-      // }
+          if (category?.subCatgories.length > 0) {
+            for (const subCategory of category.subCatgories) {
+              console.log({
+                name: subCategory.name,
+                description: subCategory.description,
+                nameEN: subCategory.nameEN,
+                categoryId: createdCategory.id,
+              });
+              await this.prisma.subCategory.create({
+                data: {
+                  name: subCategory.name,
+                  description: subCategory.description,
+                  nameEN: subCategory.nameEN,
+                  categoryId: createdCategory.id,
+                },
+              }); //
+            }
+          }
+        }
+      }
       console.log('👘👖👠👡👞 Initialized categories Successful !!! 👒🎩👟👢 ');
     } catch (error) {
       console.log({ initialCategoriesError: error });

@@ -5,6 +5,7 @@ CREATE TABLE `User` (
     `password` VARCHAR(191) NOT NULL,
     `userType` ENUM('CUSTOMER', 'ADMIN') NOT NULL,
     `isAdministrator` BOOLEAN NOT NULL,
+    `isActive` BOOLEAN NOT NULL DEFAULT false,
     `deletedFlg` BOOLEAN NOT NULL DEFAULT false,
     `deletedAt` DATETIME(3) NULL,
     `createdBy` INTEGER NULL,
@@ -14,6 +15,27 @@ CREATE TABLE `User` (
     `metadata` JSON NULL,
 
     UNIQUE INDEX `User_username_key`(`username`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `UserSetting` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `lastLogin` DATETIME(3) NULL,
+    `lastLogout` DATETIME(3) NULL,
+    `darkMode` BOOLEAN NOT NULL DEFAULT false,
+    `themes` ENUM('NONE', 'HOLLIDAY') NULL DEFAULT 'NONE',
+    `language` ENUM('VIETNAMESE', 'ENGLISH', 'CHINESE', 'JAPANESE') NULL DEFAULT 'VIETNAMESE',
+    `userId` INTEGER NOT NULL,
+    `deletedFlg` BOOLEAN NOT NULL DEFAULT false,
+    `deletedAt` DATETIME(3) NULL,
+    `createdBy` INTEGER NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedBy` INTEGER NULL,
+    `updatedAt` DATETIME(3) NOT NULL,
+    `metadata` JSON NULL,
+
+    UNIQUE INDEX `UserSetting_userId_key`(`userId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -99,6 +121,7 @@ CREATE TABLE `Address` (
     `state` VARCHAR(191) NULL,
     `postalCode` VARCHAR(191) NULL,
     `detailAddress` VARCHAR(191) NULL,
+    `isDefault` BOOLEAN NOT NULL DEFAULT false,
     `metadata` JSON NULL,
     `deletedFlg` BOOLEAN NOT NULL DEFAULT false,
     `deletedAt` DATETIME(3) NULL,
@@ -152,6 +175,7 @@ CREATE TABLE `Category` (
     `description` TEXT NULL,
     `introduction` VARCHAR(191) NULL,
     `metadata` JSON NULL,
+    `thumbnail` VARCHAR(191) NULL,
     `deletedFlg` BOOLEAN NOT NULL DEFAULT false,
     `deletedAt` DATETIME(3) NULL,
     `createdBy` INTEGER NULL,
@@ -170,6 +194,30 @@ CREATE TABLE `SubCategory` (
     `description` TEXT NULL,
     `categoryId` INTEGER NOT NULL,
     `introduction` VARCHAR(191) NULL,
+    `metadata` JSON NULL,
+    `thumbnail` VARCHAR(191) NULL,
+    `deletedFlg` BOOLEAN NOT NULL DEFAULT false,
+    `deletedAt` DATETIME(3) NULL,
+    `createdBy` INTEGER NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedBy` INTEGER NULL,
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Event` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `title` VARCHAR(191) NOT NULL,
+    `introduction` VARCHAR(191) NULL,
+    `description` TEXT NULL,
+    `image` VARCHAR(191) NULL,
+    `validFrom` DATETIME(3) NOT NULL,
+    `validTo` DATETIME(3) NOT NULL,
+    `condition` JSON NULL,
+    `salePercent` DOUBLE NULL,
+    `discount` DOUBLE NULL,
     `metadata` JSON NULL,
     `deletedFlg` BOOLEAN NOT NULL DEFAULT false,
     `deletedAt` DATETIME(3) NULL,
@@ -193,9 +241,11 @@ CREATE TABLE `Product` (
     `discount` DOUBLE NULL,
     `new` BOOLEAN NULL,
     `hot` BOOLEAN NULL,
+    `thumbnail` VARCHAR(191) NULL,
     `status` ENUM('INSTOCK', 'AVAILABLE', 'SOLD_OUT') NOT NULL DEFAULT 'AVAILABLE',
     `categoryId` INTEGER NOT NULL,
     `subCategoryId` INTEGER NOT NULL,
+    `eventId` INTEGER NULL,
     `deletedFlg` BOOLEAN NOT NULL DEFAULT false,
     `deletedAt` DATETIME(3) NULL,
     `createdBy` INTEGER NULL,
@@ -265,6 +315,7 @@ CREATE TABLE `ProductVariant` (
     `colorId` INTEGER NOT NULL,
     `sizeId` INTEGER NOT NULL,
     `stock` INTEGER NULL,
+    `image` VARCHAR(191) NULL,
     `metadata` JSON NULL,
     `deletedFlg` BOOLEAN NOT NULL DEFAULT false,
     `deletedAt` DATETIME(3) NULL,
@@ -280,8 +331,28 @@ CREATE TABLE `ProductVariant` (
 -- CreateTable
 CREATE TABLE `ProductImage` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `productId` INTEGER NOT NULL,
     `imageUrl` VARCHAR(191) NOT NULL,
+    `productId` INTEGER NOT NULL,
+    `orderIndex` INTEGER NOT NULL,
+    `metadata` JSON NULL,
+    `deletedFlg` BOOLEAN NOT NULL DEFAULT false,
+    `deletedAt` DATETIME(3) NULL,
+    `createdBy` INTEGER NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedBy` INTEGER NULL,
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Review` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `rating` INTEGER NOT NULL,
+    `comment` VARCHAR(191) NULL,
+    `productId` INTEGER NOT NULL,
+    `userId` INTEGER NOT NULL,
+    `isIncognito` BOOLEAN NULL DEFAULT false,
     `metadata` JSON NULL,
     `deletedFlg` BOOLEAN NOT NULL DEFAULT false,
     `deletedAt` DATETIME(3) NULL,
@@ -344,7 +415,7 @@ CREATE TABLE `Voucher` (
 CREATE TABLE `Banner` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `title` VARCHAR(191) NULL,
-    `desc` VARCHAR(191) NULL,
+    `description` TEXT NULL,
     `url` VARCHAR(191) NOT NULL,
     `metadata` JSON NULL,
     `deletedFlg` BOOLEAN NOT NULL DEFAULT false,
@@ -363,11 +434,13 @@ CREATE TABLE `Contact` (
     `email` VARCHAR(191) NULL,
     `title` TEXT NOT NULL,
     `content` TEXT NOT NULL,
+    `image` VARCHAR(191) NULL,
     `status` ENUM('WAITING', 'PROCESSING', 'DONE') NOT NULL DEFAULT 'WAITING',
     `Type` ENUM('BUG', 'EXCHANGE', 'ANOTHER') NOT NULL DEFAULT 'EXCHANGE',
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
     `deletedAt` DATETIME(3) NULL,
+    `deletedFlg` BOOLEAN NOT NULL DEFAULT false,
     `userId` INTEGER NULL,
 
     PRIMARY KEY (`id`)
@@ -402,73 +475,85 @@ CREATE TABLE `_PermissionToRole` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `Role` ADD CONSTRAINT `Role_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `UserSetting` ADD CONSTRAINT `UserSetting_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Avatar` ADD CONSTRAINT `Avatar_profileId_fkey` FOREIGN KEY (`profileId`) REFERENCES `Profile`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Role` ADD CONSTRAINT `Role_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Profile` ADD CONSTRAINT `Profile_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Avatar` ADD CONSTRAINT `Avatar_profileId_fkey` FOREIGN KEY (`profileId`) REFERENCES `Profile`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Address` ADD CONSTRAINT `Address_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Profile` ADD CONSTRAINT `Profile_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Cart` ADD CONSTRAINT `Cart_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Address` ADD CONSTRAINT `Address_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `CartItem` ADD CONSTRAINT `CartItem_cartId_fkey` FOREIGN KEY (`cartId`) REFERENCES `Cart`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Cart` ADD CONSTRAINT `Cart_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `CartItem` ADD CONSTRAINT `CartItem_productId_fkey` FOREIGN KEY (`productId`) REFERENCES `Product`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `CartItem` ADD CONSTRAINT `CartItem_cartId_fkey` FOREIGN KEY (`cartId`) REFERENCES `Cart`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `CartItem` ADD CONSTRAINT `CartItem_variantId_fkey` FOREIGN KEY (`variantId`) REFERENCES `ProductVariant`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `CartItem` ADD CONSTRAINT `CartItem_productId_fkey` FOREIGN KEY (`productId`) REFERENCES `Product`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `SubCategory` ADD CONSTRAINT `SubCategory_categoryId_fkey` FOREIGN KEY (`categoryId`) REFERENCES `Category`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `CartItem` ADD CONSTRAINT `CartItem_variantId_fkey` FOREIGN KEY (`variantId`) REFERENCES `ProductVariant`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Product` ADD CONSTRAINT `Product_categoryId_fkey` FOREIGN KEY (`categoryId`) REFERENCES `Category`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `SubCategory` ADD CONSTRAINT `SubCategory_categoryId_fkey` FOREIGN KEY (`categoryId`) REFERENCES `Category`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Product` ADD CONSTRAINT `Product_subCategoryId_fkey` FOREIGN KEY (`subCategoryId`) REFERENCES `SubCategory`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Product` ADD CONSTRAINT `Product_categoryId_fkey` FOREIGN KEY (`categoryId`) REFERENCES `Category`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `ProductVariant` ADD CONSTRAINT `ProductVariant_productId_fkey` FOREIGN KEY (`productId`) REFERENCES `Product`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Product` ADD CONSTRAINT `Product_subCategoryId_fkey` FOREIGN KEY (`subCategoryId`) REFERENCES `SubCategory`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `ProductVariant` ADD CONSTRAINT `ProductVariant_colorId_fkey` FOREIGN KEY (`colorId`) REFERENCES `Color`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Product` ADD CONSTRAINT `Product_eventId_fkey` FOREIGN KEY (`eventId`) REFERENCES `Event`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `ProductVariant` ADD CONSTRAINT `ProductVariant_sizeId_fkey` FOREIGN KEY (`sizeId`) REFERENCES `Size`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `ProductVariant` ADD CONSTRAINT `ProductVariant_productId_fkey` FOREIGN KEY (`productId`) REFERENCES `Product`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `ProductVariant` ADD CONSTRAINT `ProductVariant_materialId_fkey` FOREIGN KEY (`materialId`) REFERENCES `Material`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `ProductVariant` ADD CONSTRAINT `ProductVariant_colorId_fkey` FOREIGN KEY (`colorId`) REFERENCES `Color`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `ProductImage` ADD CONSTRAINT `ProductImage_productId_fkey` FOREIGN KEY (`productId`) REFERENCES `Product`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `ProductVariant` ADD CONSTRAINT `ProductVariant_sizeId_fkey` FOREIGN KEY (`sizeId`) REFERENCES `Size`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Order` ADD CONSTRAINT `Order_customerId_fkey` FOREIGN KEY (`customerId`) REFERENCES `User`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `ProductVariant` ADD CONSTRAINT `ProductVariant_materialId_fkey` FOREIGN KEY (`materialId`) REFERENCES `Material`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Order` ADD CONSTRAINT `Order_addressId_fkey` FOREIGN KEY (`addressId`) REFERENCES `Address`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `ProductImage` ADD CONSTRAINT `ProductImage_productId_fkey` FOREIGN KEY (`productId`) REFERENCES `Product`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Order` ADD CONSTRAINT `Order_voucherId_fkey` FOREIGN KEY (`voucherId`) REFERENCES `Voucher`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `Review` ADD CONSTRAINT `Review_productId_fkey` FOREIGN KEY (`productId`) REFERENCES `Product`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Contact` ADD CONSTRAINT `Contact_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `Review` ADD CONSTRAINT `Review_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `OrderItem` ADD CONSTRAINT `OrderItem_orderId_fkey` FOREIGN KEY (`orderId`) REFERENCES `Order`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Order` ADD CONSTRAINT `Order_customerId_fkey` FOREIGN KEY (`customerId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `OrderItem` ADD CONSTRAINT `OrderItem_productId_fkey` FOREIGN KEY (`productId`) REFERENCES `Product`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Order` ADD CONSTRAINT `Order_addressId_fkey` FOREIGN KEY (`addressId`) REFERENCES `Address`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `OrderItem` ADD CONSTRAINT `OrderItem_variantId_fkey` FOREIGN KEY (`variantId`) REFERENCES `ProductVariant`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Order` ADD CONSTRAINT `Order_voucherId_fkey` FOREIGN KEY (`voucherId`) REFERENCES `Voucher`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Contact` ADD CONSTRAINT `Contact_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `OrderItem` ADD CONSTRAINT `OrderItem_orderId_fkey` FOREIGN KEY (`orderId`) REFERENCES `Order`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `OrderItem` ADD CONSTRAINT `OrderItem_productId_fkey` FOREIGN KEY (`productId`) REFERENCES `Product`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `OrderItem` ADD CONSTRAINT `OrderItem_variantId_fkey` FOREIGN KEY (`variantId`) REFERENCES `ProductVariant`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `_PermissionToRole` ADD CONSTRAINT `_PermissionToRole_A_fkey` FOREIGN KEY (`A`) REFERENCES `Permission`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
