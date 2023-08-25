@@ -24,6 +24,7 @@ import { AddressesModule } from './addresses/addresses.module';
 import { VouchersModule } from './voucher/vouchers.module';
 import { EventsModule } from './events/events.module';
 import { RedisModule } from './redis/redis.module';
+import { MailerService } from './mailer/mailer.service';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { RedisModule } from './redis/redis.module';
       provide: APP_GUARD,
       useClass: AuthorizationGuard,
     },
+    MailerService,
   ],
 })
 export class AppModule {}

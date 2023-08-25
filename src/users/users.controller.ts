@@ -19,6 +19,7 @@ import {
 import { UpdateProfileDto } from './dtos/profile.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { AuthorizationGuard } from 'src/auth/authorization.guard';
+import { UpdateSettingDto } from './dtos/setting.dto';
 
 @Controller('users')
 export class UsersController {
@@ -64,6 +65,15 @@ export class UsersController {
     @Body() payload: UpdateProfileDto,
   ) {
     const result = await this.usersService.updateProfile(id, payload);
+    return result;
+  }
+
+  @Put('/update-setting/:id')
+  public async updateSetting(
+    @Param(':id', new ParseIntPipe({ optional: true })) id: number,
+    @Body() payload: UpdateSettingDto,
+  ) {
+    const result = await this.usersService.updateSetting(id, payload);
     return result;
   }
 

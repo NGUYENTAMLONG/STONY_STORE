@@ -29,6 +29,7 @@ export class InitializationsService implements OnModuleInit {
           userType: 'ADMIN',
         },
       });
+
       if (!foundExistedAdmin) {
         const usernameAdmin = process.env.USERNAME_ADMIN;
         const passwordAdmin = process.env.PASSWORD_ADMIN;
@@ -43,6 +44,7 @@ export class InitializationsService implements OnModuleInit {
             password: hashedPassword,
             userType: 'ADMIN',
             isAdministrator: true,
+            isActive: true,
           },
         });
         console.log('🌻🌻🌻 Initialized Successful !!! 🍔🍔🍔');
