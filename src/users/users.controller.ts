@@ -17,8 +17,8 @@ import {
   UserIdArrayDto,
 } from './dtos/users.dto';
 import { UpdateProfileDto } from './dtos/profile.dto';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { AuthorizationGuard } from 'src/auth/authorization.guard';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { AuthorizationGuard } from 'src/auth/guards/authorization.guard';
 import { UpdateSettingDto } from './dtos/setting.dto';
 
 @Controller('users')

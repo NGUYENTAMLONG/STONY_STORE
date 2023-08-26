@@ -34,13 +34,13 @@ export const EXCEPTION_AUTH = {
     code: 'auth007',
   },
 
-  EMAIL_DOES_NOT_EXISTED: {
-    message: 'EMAIL DOES NOT EXISTED',
+  EMAIL_DOES_NOT_EXIST: {
+    message: 'EMAIL DOES NOT EXIST',
     code: 'auth008',
   },
 
-  USER_DOES_NOT_EXISTED: {
-    message: 'USER DOES NOT EXISTED',
+  USER_DOES_NOT_EXIST: {
+    message: 'USER DOES NOT EXIST',
     code: 'auth009',
   },
 

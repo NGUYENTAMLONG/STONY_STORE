@@ -28,4 +28,8 @@ export class CreateProductVariantDto {
   @IsNumberString()
   @IsOptional()
   materialId?: number;
+
+  @IsNumberString()
+  @IsOptional()
+  quantity?: number;
 }

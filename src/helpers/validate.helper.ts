@@ -72,3 +72,34 @@ export const validatePassword = (password: string) => {
     message: 'Password is valid / Mật khẩu hợp lệ',
   };
 };
+
+export const validatePhoneNumber = (phoneNumber: string) => {
+  // Loại bỏ khoảng trắng và dấu gạch ngang, nếu có
+  const cleanedPhoneNumber = phoneNumber.replace(/\s|-/g, '');
+
+  // Kiểm tra xem chuỗi sau khi loại bỏ có phải là số
+  if (!/^\d+$/.test(cleanedPhoneNumber)) {
+    return false;
+  }
+
+  // Kiểm tra độ dài số điện thoại (phần số)
+  if (cleanedPhoneNumber.length !== 10) {
+    return false;
+  }
+
+  // Kiểm tra số điện thoại không bắt đầu bằng số 0 hoặc 1 (trong ngữ cảnh của một số điện thoại tại một số quốc gia)
+  if (/^[01]/.test(cleanedPhoneNumber)) {
+    return false;
+  }
+
+  // Nếu tất cả các điều kiện trên được đáp ứng, số điện thoại hợp lệ
+  return true;
+};
+
+// // Sử dụng hàm để kiểm tra số điện thoại
+// const phoneNumber = '123-456-7890';
+// if (validatePhoneNumber(phoneNumber)) {
+//   console.log('Số điện thoại hợp lệ.');
+// } else {
+//   console.log('Số điện thoại không hợp lệ.');
+// }
