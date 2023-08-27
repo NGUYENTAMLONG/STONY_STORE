@@ -1,20 +1,25 @@
-// import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-
 import { Languages, Themes } from '@prisma/client';
-import { IsBoolean, IsEnum, IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsBooleanString,
+  IsEnum,
+  IsNumberString,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class UpdateSettingDto {
   @IsBoolean()
   @IsOptional()
-  darkMode: boolean;
+  darkMode?: boolean;
 
   @IsEnum(Themes)
   @IsOptional()
   @IsString()
-  themes: string;
+  themes?: string;
 
   @IsEnum(Languages)
   @IsOptional()
   @IsString()
-  languages: string;
+  languages?: string;
 }
