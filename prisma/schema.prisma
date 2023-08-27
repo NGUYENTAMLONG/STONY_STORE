@@ -11,8 +11,8 @@ datasource db {
 }
 
 model User {
-  id              Int          @id @default(autoincrement())
-  username        String       @unique
+  id              Int              @id @default(autoincrement())
+  username        String           @unique
   password        String
   userType        UserType
   cart            Cart?
@@ -21,18 +21,20 @@ model User {
   setting         UserSetting?
   isAdministrator Boolean
   roles           Role[]
-  isActive        Boolean      @default(false)
+  isActive        Boolean          @default(false)
   //
-  deletedFlg      Boolean      @default(false)
+  deletedFlg      Boolean          @default(false)
   deletedAt       DateTime?
   createdBy       Int?
-  createdAt       DateTime     @default(now())
+  createdAt       DateTime         @default(now())
   updatedBy       Int?
-  updatedAt       DateTime     @updatedAt
+  updatedAt       DateTime         @updatedAt
   metadata        Json?
   order           Order[]
   contact         Contact[]
   reviews         Review[]
+  PurchaseHistory PurchaseHistory?
+  Favorite        Favorite?
 }
 
 model UserSetting {
@@ -244,6 +246,8 @@ model Product {
   new           Boolean?
   hot           Boolean?
   thumbnail     String?
+  quantity      Int?
+  stock         Int?
   status        ProductStatus    @default(AVAILABLE)
   categoryId    Int
   category      Category         @relation(fields: [categoryId], references: [id], onDelete: Cascade)
@@ -264,6 +268,8 @@ model Product {
   updatedAt     DateTime         @updatedAt
   metadata      Json?
   orderItem     OrderItem[]
+  Favorite      Favorite?        @relation(fields: [favoriteId], references: [id], onDelete: Cascade)
+  favoriteId    Int?
 }
 
 model Color {
@@ -316,6 +322,7 @@ model ProductVariant {
   productId  Int
   colorId    Int
   sizeId     Int
+  quantity   Int
   stock      Int?
   image      String?
   product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
@@ -368,30 +375,32 @@ model Review {
 }
 
 model Order {
-  id              Int         @id @default(autoincrement())
-  orderNumber     String      @unique
-  customerId      Int
-  customer        User        @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  orderDate       DateTime    @default(now())
-  shippingAddress Address     @relation(fields: [addressId], references: [id], onDelete: Cascade)
-  items           OrderItem[]
-  subtotal        Float
-  tax             Float
-  discount        Float
-  total           Float
-  addressId       Int
-  phoneRecipient  String
-  phoneDeliver    String?
-  status          OrderStatus @default(WAITING)
-  metadata        Json?
-  deletedFlg      Boolean     @default(false)
-  deletedAt       DateTime?
-  createdBy       Int?
-  createdAt       DateTime    @default(now())
-  updatedBy       Int?
-  updatedAt       DateTime    @updatedAt
-  voucher         Voucher?    @relation(fields: [voucherId], references: [id], onDelete: Cascade)
-  voucherId       Int?
+  id                Int              @id @default(autoincrement())
+  code              String           @unique
+  customerId        Int
+  customer          User             @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  orderDate         DateTime         @default(now())
+  shippingAddress   Address          @relation(fields: [addressId], references: [id], onDelete: Cascade)
+  items             OrderItem[]
+  subtotal          Float?
+  tax               Float?
+  discount          Float?
+  total             Float
+  addressId         Int
+  phoneRecipient    String
+  phoneDeliver      String?
+  status            OrderStatus      @default(WAITING)
+  metadata          Json?
+  deletedFlg        Boolean          @default(false)
+  deletedAt         DateTime?
+  createdBy         Int?
+  createdAt         DateTime         @default(now())
+  updatedBy         Int?
+  updatedAt         DateTime         @updatedAt
+  voucher           Voucher?         @relation(fields: [voucherId], references: [id], onDelete: Cascade)
+  voucherId         Int?
+  PurchaseHistory   PurchaseHistory? @relation(fields: [purchaseHistoryId], references: [id], onDelete: Cascade)
+  purchaseHistoryId Int?
 }
 
 model Voucher {
@@ -460,9 +469,38 @@ model OrderItem {
   updatedAt  DateTime       @updatedAt
 }
 
+model PurchaseHistory {
+  id         Int       @id @default(autoincrement())
+  userId     Int       @unique
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orders     Order[]
+  metadata   Json?
+  deletedFlg Boolean   @default(false)
+  deletedAt  DateTime?
+  createdBy  Int?
+  createdAt  DateTime  @default(now())
+  updatedBy  Int?
+  updatedAt  DateTime  @updatedAt
+}
+
+model Favorite {
+  id         Int       @id @default(autoincrement())
+  userId     Int       @unique
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  products   Product[]
+  metadata   Json?
+  deletedFlg Boolean   @default(false)
+  deletedAt  DateTime?
+  createdBy  Int?
+  createdAt  DateTime  @default(now())
+  updatedBy  Int?
+  updatedAt  DateTime  @updatedAt
+}
+
 enum UserType {
-  CUSTOMER
   ADMIN
+  STAFF
+  CUSTOMER
 }
 
 enum Gender {

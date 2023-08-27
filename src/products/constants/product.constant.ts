@@ -23,4 +23,8 @@ export const EXCEPTION_PRODUCT = {
     message: 'INVALID ARRAY OF IDS',
     code: 'Product006',
   },
+  PRODUCT_DOES_NOT_EXIST: {
+    message: 'PRODUCT DOES NOT EXIST',
+    code: 'Product007',
+  },
 };

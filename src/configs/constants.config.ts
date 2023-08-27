@@ -409,6 +409,81 @@ export const SIZES = [
     nameEN: '4XL',
     description: 'Chiều cao 1m65 - 1m85 / Cân nặng 80 - 90 (KG)',
   },
+  {
+    name: '35',
+    nameEN: '35',
+    description: 'Số đo cỡ chân giày dép',
+  },
+  {
+    name: '33',
+    nameEN: '33',
+    description: 'Số đo cỡ chân giày dép',
+  },
+  {
+    name: '34',
+    nameEN: '34',
+    description: 'Số đo cỡ chân giày dép',
+  },
+  {
+    name: '35',
+    nameEN: '35',
+    description: 'Số đo cỡ chân giày dép',
+  },
+  {
+    name: '36',
+    nameEN: '36',
+    description: 'Số đo cỡ chân giày dép',
+  },
+  {
+    name: '37',
+    nameEN: '37',
+    description: 'Số đo cỡ chân giày dép',
+  },
+  {
+    name: '38',
+    nameEN: '38',
+    description: 'Số đo cỡ chân giày dép',
+  },
+  {
+    name: '39',
+    nameEN: '39',
+    description: 'Số đo cỡ chân giày dép',
+  },
+  {
+    name: '40',
+    nameEN: '40',
+    description: 'Số đo cỡ chân giày dép',
+  },
+  {
+    name: '41',
+    nameEN: '41',
+    description: 'Số đo cỡ chân giày dép',
+  },
+  {
+    name: '42',
+    nameEN: '42',
+    description: 'Số đo cỡ chân giày dép',
+  },
+  {
+    name: '43',
+    nameEN: '43',
+    description: 'Số đo cỡ chân giày dép',
+  },
+  {
+    name: '44',
+    nameEN: '44',
+    description: 'Số đo cỡ chân giày dép',
+  },
+  {
+    name: '45',
+    nameEN: '45',
+    description: 'Số đo cỡ chân giày dép',
+  },
+  {
+    name: '46',
+    nameEN: '46',
+    description: 'Số đo cỡ chân giày dép',
+  },
 ];
 export const MATERIALS = [
   {

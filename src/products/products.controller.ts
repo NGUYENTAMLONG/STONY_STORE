@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -12,6 +11,8 @@ import {
   UploadedFile,
   UploadedFiles,
   UseInterceptors,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
@@ -23,6 +24,9 @@ import { CreateProductVariantDto } from './dtos/create-product-variant';
 import { Variant, VariantParamDto } from './dtos/search-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
 import { DeleteDetailImagesDto } from './dtos/delete.dtos';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { UserType } from '@prisma/client';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
@@ -38,6 +42,14 @@ export class ProductsController {
       limit,
       data: products,
     };
+  }
+
+  @Get('favorite')
+  @Roles(UserType.CUSTOMER)
+  @UseGuards(JwtAuthGuard)
+  public async findFavoriteProducts(@Request() req) {
+    const products = await this.productsService.findFavoriteProducts(req.user);
+    return products;
   }
 
   @Get(':id')
@@ -58,11 +70,13 @@ export class ProductsController {
   }
 
   @Post()
+  @Roles(UserType.STAFF)
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(
     FileInterceptor('thumbnail', {
       // Enable file size limits
       limits: {
-        fileSize: 50000, //+process.env.MAX_FILE_SIZE,
+        fileSize: 5000000, //(5MB) //+process.env.MAX_FILE_SIZE,
       },
       fileFilter: imageFileFilter,
       storage: diskStorage({
@@ -82,19 +96,27 @@ export class ProductsController {
     // }),
   )
   public async createProduct(
+    @Request() req,
     @Body() payload: CreateProductDto,
     @UploadedFile() thumbnail: Express.Multer.File,
     @Body() variants?: CreateProductVariantDto[],
   ) {
-    return this.productsService.createOneProduct(payload, thumbnail, variants);
+    return this.productsService.createOneProduct(
+      req.user,
+      payload,
+      thumbnail,
+      variants,
+    );
   }
 
   @Post('/:id/upload-detail-images')
+  @Roles(UserType.STAFF)
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(
     FilesInterceptor('imageDetails', 7, {
       fileFilter: imageFileFilter,
       limits: {
-        fileSize: 50000, //+process.env.MAX_FILE_SIZE,
+        fileSize: 5000000, //+process.env.MAX_FILE_SIZE,
       },
       storage: diskStorage({
         destination: './src/public/images/details',
@@ -103,18 +125,26 @@ export class ProductsController {
     }),
   )
   public async createProductImageDetails(
+    @Request() req,
     @Param('id', new ParseIntPipe({ optional: true })) id: number,
     @UploadedFiles() imageDetails: Express.Multer.File[],
   ) {
-    return this.productsService.uploadDetailImages(id, imageDetails);
+    return this.productsService.uploadDetailImages(req.user, id, imageDetails);
   }
 
   @Post('/:id/create-variants')
+  @Roles(UserType.STAFF)
+  @UseGuards(JwtAuthGuard)
   public async createProductVariants(
+    @Request() req,
     @Param('id', new ParseIntPipe({ optional: true })) productId: number,
     @Body() variants: CreateProductVariantDto[],
   ) {
-    return this.productsService.createProductVariants(productId, variants);
+    return this.productsService.createProductVariants(
+      req.user,
+      productId,
+      variants,
+    );
   }
 
   @Delete('/soft-delete/:id')
@@ -134,7 +164,7 @@ export class ProductsController {
     FileInterceptor('thumbnail', {
       // Enable file size limits
       limits: {
-        fileSize: 20000, //+process.env.MAX_FILE_SIZE,
+        fileSize: 5000000, //+process.env.MAX_FILE_SIZE,
       },
       fileFilter: imageFileFilter,
       storage: diskStorage({

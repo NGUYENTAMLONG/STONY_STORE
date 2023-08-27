@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { PrismaClient, Product, ProductVariant } from '@prisma/client';
+import { PrismaClient, Product, ProductVariant, User } from '@prisma/client';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { EXCEPTION_PRODUCT } from './constants/product.constant';
 import { CreateProductVariantDto } from './dtos/create-product-variant';
@@ -124,8 +124,33 @@ export class ProductsService {
       return error;
     }
   }
+  public async findFavoriteProducts(customer: User) {
+    try {
+      return this.prisma.favorite.findMany({
+        where: {
+          userId: customer.id,
+          deletedAt: null,
+          deletedFlg: false,
+          createdBy: customer.id,
+        },
+        include: {
+          products: {
+            where: {
+              deletedAt: null,
+              deletedFlg: false,
+            },
+            // skip,take
+          },
+        },
+      });
+    } catch (error) {
+      console.log({ productFindFavorieProductsError: error });
+      return error;
+    }
+  }
 
   public async createOneProduct(
+    userReq: User,
     payload: CreateProductDto,
     thumbnail: Express.Multer.File,
     variants?: CreateProductVariantDto[],
@@ -163,12 +188,14 @@ export class ProductsService {
           new: true,
           subCategoryId: Number(subCategoryId),
           thumbnail: `/images/thumbnails/${thumbnail.filename}`,
+          createdBy: userReq.id,
           ...rest,
         },
       });
       if (variants && variants.length > 0) {
         for (const variant of variants) {
-          const { colorId, materialId, productId, sizeId, stock } = variant;
+          const { colorId, materialId, productId, sizeId, stock, quantity } =
+            variant;
           const createProductVariant = await this.prisma.productVariant.create({
             data: {
               colorId,
@@ -176,6 +203,9 @@ export class ProductsService {
               productId,
               sizeId,
               stock,
+              quantity,
+              createdBy: userReq.id,
+              //image ?
             },
           });
         }
@@ -187,6 +217,7 @@ export class ProductsService {
     }
   }
   public async createProductVariants(
+    userReq: User,
     productId: number,
     variants: CreateProductVariantDto[],
   ): Promise<any> {
@@ -207,7 +238,8 @@ export class ProductsService {
 
       if (variants && variants.length > 0) {
         for (const variant of variants) {
-          const { colorId, materialId, productId, sizeId, stock } = variant;
+          const { colorId, materialId, productId, sizeId, stock, quantity } =
+            variant;
           const createProductVariant = await this.prisma.productVariant.create({
             data: {
               colorId,
@@ -215,6 +247,9 @@ export class ProductsService {
               productId: foundProduct.id,
               sizeId,
               stock,
+              quantity,
+              createdBy: userReq.id,
+              // image
             },
           });
         }
@@ -230,6 +265,7 @@ export class ProductsService {
     }
   }
   public async uploadDetailImages(
+    userReq: User,
     productId: number,
     imageDetails: Express.Multer.File[],
   ): Promise<any> {
@@ -252,6 +288,7 @@ export class ProductsService {
           imageUrl: `/images/details/${img.filename}`,
           productId: Number(productId),
           orderIndex: index + 1,
+          createdBy: userReq.id,
         };
       });
       const updateDetailImages = await this.prisma.productImage.createMany({

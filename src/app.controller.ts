@@ -1,9 +1,15 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, UseGuards, Request } from '@nestjs/common';
 import { AppService } from './app.service';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { Roles } from './auth/decorators/roles.decorator';
+import { PrismaClient, UserType } from '@prisma/client';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly appService: AppService,
+    private readonly prisma: PrismaClient,
+  ) {}
 
   @Get()
   getHello(): string {
@@ -11,16 +17,22 @@ export class AppController {
   }
 
   @Get('/route-for-admin')
-  getForAdmin(): string {
-    return 'PASSED (ADMIN)';
+  @Roles(UserType.ADMIN)
+  @UseGuards(JwtAuthGuard)
+  getForAdmin(@Request() req): string {
+    return req.user;
   }
 
   @Get('/route-for-staff')
-  getForStaff(): string {
-    return 'PASSED (STAFF)';
+  @Roles()
+  @UseGuards(JwtAuthGuard)
+  getForStaff(@Request() req) {
+    return req.user;
   }
 
   @Get('/route-for-customer')
+  @Roles(UserType.CUSTOMER)
+  @UseGuards(JwtAuthGuard)
   getForCustomer(): string {
     return 'PASSED (CUSTOMER)';
   }

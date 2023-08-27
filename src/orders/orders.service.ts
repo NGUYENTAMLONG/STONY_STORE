@@ -3,7 +3,7 @@ import {
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, User } from '@prisma/client';
 import { Order } from '@prisma/client';
 import {
   CreateOrderDto,
@@ -13,7 +13,9 @@ import {
   UpdateOrderDto,
 } from './dtos/orders.dto';
 import { EXCEPTION_ORDER } from './constants/order.constant';
-import * as fs from 'fs';
+import { v4 as uuidv4 } from 'uuid';
+import { EXCEPTION_ADDRESS } from 'src/addresses/constants/address.constant';
+import { validatePhoneNumber } from 'src/helpers/validate.helper';
 
 @Injectable()
 export class OrdersService {
@@ -37,12 +39,96 @@ export class OrdersService {
     }
   }
 
-  public async createOneOrder(payload: CreateOrderDto): Promise<Order> {
+  public async getMyOrderList(
+    customer: User,
+    page: number,
+    limit: number,
+  ): Promise<Order[]> {
     try {
-      const { description, metadata } = payload;
+      const offset = (page - 1) * limit;
+      const orders = await this.prisma.order.findMany({
+        where: {
+          customerId: customer.id,
+          deletedAt: null,
+          deletedFlg: false,
+          createdBy: customer.id,
+        },
+        skip: offset,
+        take: limit,
+      });
+      return orders;
+    } catch (error) {
+      console.log({ orderListError: error });
+      return error;
+    }
+  }
+
+  public async createOneOrder(
+    customer: User,
+    payload: CreateOrderDto,
+  ): Promise<Order> {
+    try {
+      const {
+        addressId,
+        phoneRecipient,
+        note,
+        discount,
+        tax,
+        phoneDeliver,
+        subtotal,
+        items,
+      } = payload;
+
+      const foundAddress = await this.prisma.address.findFirst({
+        where: {
+          id: addressId,
+          userId: customer.id,
+          createdBy: customer.id,
+        },
+      });
+      if (!foundAddress) {
+        throw new BadRequestException(EXCEPTION_ADDRESS.ADDRESS_NOT_FOUND);
+      }
+
+      const phoneNumberIsValid = validatePhoneNumber(phoneRecipient);
+      if (!phoneNumberIsValid) {
+        throw new BadRequestException(EXCEPTION_ORDER.PHONE_NUMBER_IS_INVALID);
+      }
+      let metadata = {};
+      if (note) {
+        metadata['note'] = note;
+      }
+      const initOrder = await this.prisma.order.create({
+        data: {
+          code: uuidv4(),
+          addressId,
+          phoneRecipient,
+          customerId: customer.id,
+          total: 0,
+          createdBy: customer.id,
+          metadata: JSON.stringify(metadata),
+          discount,
+          tax,
+          phoneDeliver,
+          subtotal: Number(subtotal),
+          // purchaseHistoryId:1
+        },
+      });
+
+      for (const item of items) {
+        const { productId, quantity, variantId } = item;
+        const createOrderItem = this.prisma.orderItem.create({
+          data: {
+            productId,
+            variantId,
+            quantity,
+            orderId: initOrder.id,
+            createdBy: customer.id,
+          },
+        });
+      }
       //   const createOrder = await this.prisma.order.create({
       //     data: {
-
       //       description,
       //       metadata: metadata,
       //     },
@@ -87,13 +173,27 @@ export class OrdersService {
     }
   }
 
-  public async getOneById(orderId: number): Promise<Order> {
+  public async getOneById(customer: User, orderId: number): Promise<Order> {
     try {
       const foundOrderById = await this.prisma.order.findFirst({
         where: {
           id: orderId,
           deletedAt: null,
           deletedFlg: false,
+          createdBy: customer.id,
+        },
+        include: {
+          items: {
+            where: {
+              deletedAt: null,
+              deletedFlg: false,
+              createdBy: customer.id,
+            },
+            include: {
+              product: true,
+              variant: true,
+            },
+          },
         },
       });
       return foundOrderById;

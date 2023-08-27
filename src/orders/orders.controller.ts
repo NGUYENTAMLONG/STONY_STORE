@@ -10,6 +10,8 @@ import {
   Query,
   UseInterceptors,
   UploadedFile,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { Controller } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -24,12 +26,17 @@ import {
 import { diskStorage } from 'multer';
 import { editFileName } from 'src/helpers/file.helper';
 import { OrdersService } from './orders.service';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { UserType } from '@prisma/client';
 
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Get()
+  @Roles(UserType.STAFF)
+  @UseGuards(JwtAuthGuard)
   public async getOrderList(
     @Query('page', new ParseIntPipe({ optional: true })) page: number = 1,
     @Query('limit', new ParseIntPipe({ optional: true })) limit: number = 10,
@@ -42,9 +49,31 @@ export class OrdersController {
     };
   }
 
+  @Get('me')
+  @Roles(UserType.CUSTOMER)
+  @UseGuards(JwtAuthGuard)
+  public async getMyOrders(
+    @Request() req,
+    @Query('page', new ParseIntPipe({ optional: true })) page: number = 1,
+    @Query('limit', new ParseIntPipe({ optional: true })) limit: number = 10,
+  ) {
+    const orders = await this.ordersService.getMyOrderList(
+      req.user,
+      page,
+      limit,
+    );
+    return {
+      page,
+      limit,
+      data: orders,
+    };
+  }
+
   @Post()
-  public async createOrder(@Body() payload: CreateOrderDto) {
-    return this.ordersService.createOneOrder(payload);
+  @Roles(UserType.CUSTOMER)
+  @UseGuards(JwtAuthGuard)
+  public async createOrder(@Request() req, @Body() payload: CreateOrderDto) {
+    return this.ordersService.createOneOrder(req.user, payload);
   }
 
   @Patch('/restore/:id')
@@ -64,10 +93,13 @@ export class OrdersController {
   }
 
   @Get(':id')
+  @Roles(UserType.CUSTOMER)
+  @UseGuards(JwtAuthGuard)
   public async findOrder(
+    @Request() req,
     @Param('id', new ParseIntPipe({ optional: true })) orderId: number,
   ) {
-    return this.ordersService.getOneById(orderId);
+    return this.ordersService.getOneById(req.user, orderId);
   }
 
   @Delete('/soft-delete/:id')

@@ -7,6 +7,8 @@ import {
   Req,
   Res,
   UnauthorizedException,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dtos/login.dto';
@@ -18,6 +20,7 @@ import {
   ForgotPassworDto,
   RecoverPassworDto,
 } from './dtos/forgot-password.dto';
+import { LocalAuthGuard } from './guards/local-auth.guard';
 
 // @ApiTags('auth')
 // @Controller({ version: ['1'], path: 'auth' })
@@ -26,32 +29,10 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
+  @UseGuards(LocalAuthGuard)
   //   @ApiOperation({ summary: 'Login' })
-  public async login(@Body() body: LoginDto) {
-    const {
-      username,
-      password,
-      // email
-    } = body;
-    if (
-      !username
-      // && !email
-    ) {
-      throw new UnauthorizedException(EXCEPTION_AUTH.UNDEFINED_EMAIL_USERNAME);
-    }
-
-    let user = null;
-    if (username) {
-      user = await this.authService.validateUserByUsername(username, password);
-    }
-    // else {
-    //   user = await this.authService.validateUserByEmail(email, password);
-    // }
-
-    if (!user) {
-      throw new UnauthorizedException(EXCEPTION_AUTH.WRONG_PASSWORD);
-    }
-    return this.authService.login(user);
+  public async login(@Request() req) {
+    return this.authService.login(req.user);
   }
 
   @Post('register')

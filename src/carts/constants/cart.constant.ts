@@ -7,4 +7,12 @@ export const EXCEPTION_CART = {
     message: 'CART EXISTED',
     code: 'cart002',
   },
+  CART_DOES_NOT_EXIST: {
+    message: 'CART DOES NOT EXIST',
+    code: 'cart003',
+  },
+  EXCEED_THE_QUANTITY: {
+    message: 'EXCEED THE QUANTITY',
+    code: 'cart004',
+  },
 };

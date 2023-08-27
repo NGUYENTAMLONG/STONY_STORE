@@ -7,7 +7,7 @@ import { ProductsModule } from './products/products.module';
 import { AuthModule } from './auth/auth.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { APP_GUARD } from '@nestjs/core';
-import { AuthorizationGuard } from './auth/authorization.guard';
+import { AuthorizationGuard } from './auth/guards/authorization.guard';
 import { ColorsModule } from './colors/colors.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
@@ -25,6 +25,9 @@ import { VouchersModule } from './voucher/vouchers.module';
 import { EventsModule } from './events/events.module';
 import { RedisModule } from './redis/redis.module';
 import { MailerService } from './mailer/mailer.service';
+import { RolesGuard } from './auth/guards/role.guard';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { PrismaClient } from '@prisma/client';
 
 @Module({
   imports: [
@@ -54,11 +57,12 @@ import { MailerService } from './mailer/mailer.service';
   controllers: [AppController],
   providers: [
     AppService,
+    PrismaClient,
     {
       provide: APP_GUARD,
-      useClass: AuthorizationGuard,
+      useClass: RolesGuard,
     },
-    MailerService,
+    // MailerService,
   ],
 })
 export class AppModule {}

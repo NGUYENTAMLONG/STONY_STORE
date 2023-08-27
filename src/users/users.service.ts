@@ -23,6 +23,14 @@ export class UsersService {
     try {
       const offset = (page - 1) * limit;
       const users = await this.prisma.user.findMany({
+        // where:{
+        //   ....//
+        // }
+        include: {
+          cart: true,
+          profile: true,
+          setting: true,
+        },
         skip: offset,
         take: limit,
       });

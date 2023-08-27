@@ -31,6 +31,7 @@ export class AuthService {
     private readonly prisma: PrismaClient,
     private readonly mailerService: MailerService,
   ) {}
+
   async validateUserByUsername(
     username: string,
     password: string,
@@ -42,7 +43,7 @@ export class AuthService {
     return this.compareAccount(password, user);
   }
 
-  //
+  // ***************
   async validateUserByEmail(email: string, password: string): Promise<User> {
     const user = await this.usersService.findOneByEmail(email);
     if (!user) {
@@ -50,13 +51,14 @@ export class AuthService {
     }
     return this.compareAccount(password, user);
   }
-  //
+  // ***************
   async compareAccount(password: string, user: User): Promise<User | null> {
     const comparePassword = await bcrypt.compare(password, user.password);
 
     if (comparePassword) {
       return user;
     }
+
     return null;
   }
 
@@ -67,7 +69,7 @@ export class AuthService {
       isAdministrator: user.isAdministrator,
       role: user.userType,
     };
-
+    // response.cookie('jwt', jwt, { httpOnly: true }); ---> consider
     return {
       username: payload.username,
       accessToken: this.jwtService.sign(payload),
@@ -130,28 +132,17 @@ export class AuthService {
         secret: process.env.TOKEN_SECRET,
       });
       const { userId, email, verifyAgain, resetedPassword } = result;
-      //check verify again
-      const setActiveAccount = await this.prisma.user.update({
-        where: {
-          id: userId,
-        },
-        data: {
-          isActive: true,
-          createdBy: userId,
-        },
+
+      const checkActiveAccount = await this.prisma.user.findFirst({
+        where: { id: userId },
       });
-      const createSetting = await this.prisma.userSetting.create({
-        data: {
-          userId,
-          createdBy: userId,
-        },
-      });
-      const createCart = await this.prisma.cart.create({
-        data: {
-          userId,
-          createdBy: userId,
-        },
-      });
+      if (checkActiveAccount.isActive) {
+        return { status: 201, message: 'SETUP SUCCESSFUL ALREADY' };
+      }
+
+      const initialResult = await this.initializeUserDependencies(userId);
+
+      // verify again
       if (verifyAgain && resetedPassword) {
         const foundUser = await this.prisma.user.findFirst({
           where: {
@@ -166,6 +157,7 @@ export class AuthService {
         );
       }
 
+      console.log(initialResult);
       return { status: 201, message: 'SETUP SUCCESSFUL' };
     } catch (error) {
       console.log(error);
@@ -185,7 +177,7 @@ export class AuthService {
       });
 
       if (!checkExistedEmail) {
-        throw new BadRequestException(EXCEPTION_AUTH.EMAIL_DOES_NOT_EXISTED);
+        throw new BadRequestException(EXCEPTION_AUTH.EMAIL_DOES_NOT_EXIST);
       }
 
       const checkExistedUser = await this.prisma.user.findFirst({
@@ -278,7 +270,7 @@ export class AuthService {
         },
       });
       if (!foundEmailProfile) {
-        throw new BadRequestException(EXCEPTION_AUTH.EMAIL_DOES_NOT_EXISTED);
+        throw new BadRequestException(EXCEPTION_AUTH.EMAIL_DOES_NOT_EXIST);
       }
       const jwt = this.jwtService.sign({
         userId: foundEmailProfile.userId,
@@ -325,5 +317,55 @@ export class AuthService {
     } catch (error) {
       return error;
     }
+  }
+
+  async initializeUserDependencies(userId) {
+    const setActiveAccountPromise = this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        isActive: true,
+        createdBy: userId,
+      },
+    });
+
+    const createSettingPromise = this.prisma.userSetting.create({
+      data: {
+        userId,
+        createdBy: userId,
+      },
+    });
+
+    const createCartPromise = this.prisma.cart.create({
+      data: {
+        userId,
+        createdBy: userId,
+      },
+    });
+
+    const initFavoritePromise = this.prisma.favorite.create({
+      data: {
+        userId,
+        createdBy: userId,
+      },
+    });
+
+    const initPurchaseHistoryPromise = this.prisma.purchaseHistory.create({
+      data: {
+        userId,
+        createdBy: userId,
+      },
+    });
+
+    const results = await Promise.all([
+      setActiveAccountPromise,
+      initFavoritePromise,
+      initPurchaseHistoryPromise,
+      createSettingPromise,
+      createCartPromise,
+    ]);
+
+    return results;
   }
 }
