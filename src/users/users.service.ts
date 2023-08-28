@@ -12,7 +12,9 @@ import {
 import { UpdateProfileDto } from './dtos/profile.dto';
 import { EXCEPTION_USER } from './constants/user.contant';
 import * as bcrypt from 'bcrypt';
+import * as fs from 'fs';
 import { config } from 'dotenv';
+import { removeOneFile } from 'src/helpers/file.helper';
 config();
 @Injectable()
 export class UsersService {
@@ -27,7 +29,11 @@ export class UsersService {
         // }
         include: {
           cart: true,
-          profile: true,
+          profile: {
+            include: {
+              avatar: true,
+            },
+          },
           setting: true,
         },
         skip: offset,
@@ -61,6 +67,32 @@ export class UsersService {
       });
     } catch (error) {
       console.log({ userFindOnebyUsernameError: error });
+      return error;
+    }
+  }
+
+  public async findUserByMySelf(customer: User): Promise<User> {
+    try {
+      return this.prisma.user.findFirst({
+        where: {
+          id: customer.id,
+          deletedAt: null,
+          deletedFlg: false,
+        },
+        include: {
+          profile: {
+            include: {
+              avatar: true,
+            },
+          },
+          shippingAddress: true,
+          Favorite: true,
+          PurchaseHistory: true,
+          setting: true,
+        },
+      });
+    } catch (error) {
+      console.log({ userFindOnebyMyselfError: error });
       return error;
     }
   }
@@ -115,23 +147,22 @@ export class UsersService {
   }
 
   public async updateProfile(
-    profileId: number,
+    customer: User,
     payload: UpdateProfileDto,
   ): Promise<any> {
     try {
-      const { firstName, lastName, gender, email, phoneNumber, address } =
-        payload;
+      const { firstName, lastName, gender, phoneNumber, address } = payload;
       const updatedUser = await this.prisma.profile.update({
         where: {
-          id: profileId,
+          id: customer.id,
         },
         data: {
           firstName,
           lastName,
           gender: gender[gender],
-          email,
           phoneNumber,
           address,
+          updatedBy: customer.id,
         },
       });
       return updatedUser;
@@ -271,5 +302,60 @@ export class UsersService {
       where: { id: userId },
       include: { roles: { include: { permissions: true } } },
     });
+  }
+
+  public async updateAvatar(
+    customer: User,
+    avatar: Express.Multer.File,
+  ): Promise<any> {
+    try {
+      const foundUser = await this.prisma.user.findFirst({
+        where: {
+          id: customer.id,
+          deletedAt: null,
+          deletedFlg: false,
+        },
+        include: {
+          profile: {
+            where: {
+              deletedAt: null,
+              deletedFlg: false,
+            },
+            include: {
+              avatar: true,
+            },
+          },
+        },
+      });
+      if (!foundUser || !foundUser?.profile) {
+        removeOneFile(`./src/public/avatars/${avatar.filename}`);
+        throw new BadRequestException(EXCEPTION_USER.USER_NOT_FOUND);
+      }
+      if (foundUser?.profile?.avatar) {
+        removeOneFile(
+          `./src/public/avatars/${
+            foundUser?.profile?.avatar.url.split('/')[3]
+          }`,
+        );
+        await this.prisma.avatar.update({
+          where: {
+            id: foundUser?.profile?.avatar.id,
+          },
+          data: {
+            url: `/images/thumbnails/${avatar.filename}`,
+          },
+        }); //update Avatar
+      } else {
+        await this.prisma.avatar.create({
+          data: {
+            url: `/images/thumbnails/${avatar.filename}`,
+            profileId: foundUser.profile.id,
+          },
+        }); //create Avatar
+      }
+      return { status: 201, message: 'UPDATE AVATAR SUCCESSFUL' };
+    } catch (error) {
+      return error;
+    }
   }
 }
