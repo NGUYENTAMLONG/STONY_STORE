@@ -8,7 +8,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors({
-    origin: ['http://127.0.0.1:5500'],
+    origin: ['http://127.0.0.1:5500', 'http://localhost:3001'],
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type', 'Authorization'], // Allow these headers
     exposedHeaders: ['Custom-Header'], // Expose this custom header to JavaScript

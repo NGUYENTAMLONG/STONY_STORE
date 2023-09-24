@@ -33,8 +33,18 @@ model User {
   order           Order[]
   contact         Contact[]
   reviews         Review[]
-  PurchaseHistory PurchaseHistory?
-  Favorite        Favorite?
+  purchaseHistory PurchaseHistory?
+  favorite        Favorite?
+
+  publicNotificationsSent     PublicNotification[] @relation("SenderRelation")
+  publicNotificationsReceived PublicNotification[] @relation("RecipientRelation")
+  PublicNotification          PublicNotification?  @relation(fields: [publicNotificationId], references: [id])
+  publicNotificationId        Int?
+
+  PrivateNotificationSent     PrivateNotification[] @relation("SenderPrivateRelation")
+  PrivateNotificationReceived PrivateNotification[] @relation("RecipientPrivateRelation")
+  PrivateNotification         PrivateNotification?  @relation(fields: [privateNotificationId], references: [id])
+  privateNotificationId       Int?
 }
 
 model UserSetting {
@@ -107,6 +117,8 @@ model Profile {
   email       String?   @unique
   phoneNumber String?
   address     String?
+  birthday    String?
+  biography   String?   @db.Text
   avatar      Avatar?
   userId      Int       @unique
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -268,7 +280,7 @@ model Product {
   updatedAt     DateTime         @updatedAt
   metadata      Json?
   orderItem     OrderItem[]
-  Favorite      Favorite?        @relation(fields: [favoriteId], references: [id], onDelete: Cascade)
+  favorite      Favorite?        @relation(fields: [favoriteId], references: [id], onDelete: Cascade)
   favoriteId    Int?
 }
 
@@ -375,12 +387,12 @@ model Review {
 }
 
 model Order {
-  id                Int              @id @default(autoincrement())
-  code              String           @unique
+  id                Int                 @id @default(autoincrement())
+  code              String              @unique
   customerId        Int
-  customer          User             @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  orderDate         DateTime         @default(now())
-  shippingAddress   Address          @relation(fields: [addressId], references: [id], onDelete: Cascade)
+  customer          User                @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  orderDate         DateTime            @default(now())
+  shippingAddress   Address             @relation(fields: [addressId], references: [id], onDelete: Cascade)
   items             OrderItem[]
   subtotal          Float?
   tax               Float?
@@ -389,18 +401,19 @@ model Order {
   addressId         Int
   phoneRecipient    String
   phoneDeliver      String?
-  status            OrderStatus      @default(WAITING)
+  status            OrderStatus         @default(WAITING)
   metadata          Json?
-  deletedFlg        Boolean          @default(false)
+  deletedFlg        Boolean             @default(false)
   deletedAt         DateTime?
   createdBy         Int?
-  createdAt         DateTime         @default(now())
+  createdAt         DateTime            @default(now())
   updatedBy         Int?
-  updatedAt         DateTime         @updatedAt
-  voucher           Voucher?         @relation(fields: [voucherId], references: [id], onDelete: Cascade)
+  updatedAt         DateTime            @updatedAt
+  voucher           Voucher?            @relation(fields: [voucherId], references: [id], onDelete: Cascade)
   voucherId         Int?
-  PurchaseHistory   PurchaseHistory? @relation(fields: [purchaseHistoryId], references: [id], onDelete: Cascade)
+  purchaseHistory   PurchaseHistory?    @relation(fields: [purchaseHistoryId], references: [id], onDelete: Cascade)
   purchaseHistoryId Int?
+  cancelOrderReason CancelOrderReason[]
 }
 
 model Voucher {
@@ -441,7 +454,7 @@ model Contact {
   content    String                  @db.Text
   image      String?
   status     ContactProcessingStatus @default(WAITING)
-  Type       ContactType             @default(EXCHANGE)
+  type       ContactType             @default(EXCHANGE)
   createdAt  DateTime                @default(now())
   updatedAt  DateTime                @updatedAt
   deletedAt  DateTime?
@@ -497,6 +510,68 @@ model Favorite {
   updatedAt  DateTime  @updatedAt
 }
 
+model CancelOrderReason {
+  id            Int           @id @default(autoincrement())
+  reason        String
+  initializedBy InitializedBy @default(SYSTEM)
+  acceptance    Boolean       @default(false)
+  orderId       Int
+  order         Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  metadata      Json?
+  deletedFlg    Boolean       @default(false)
+  deletedAt     DateTime?
+  createdBy     Int?
+  createdAt     DateTime      @default(now())
+  updatedBy     Int?
+  updatedAt     DateTime      @updatedAt
+}
+
+model PublicNotification {
+  id          Int              @id @default(autoincrement())
+  title       String
+  preview     String?
+  content     String           @db.Text
+  attachment  String?          @db.Text
+  thumbnail   String?          @db.Text
+  link        String?          @db.Text
+  senderId    Int              @unique
+  type        NotificationType @default(ANOTHER)
+  sender      User             @relation("SenderRelation", fields: [senderId], references: [id], onDelete: Cascade)
+  recipientId Int              @unique
+  recipient   User             @relation("RecipientRelation", fields: [recipientId], references: [id], onDelete: Cascade)
+  metadata    Json?
+  deletedFlg  Boolean          @default(false)
+  deletedAt   DateTime?
+  createdBy   Int?
+  createdAt   DateTime         @default(now())
+  updatedBy   Int?
+  updatedAt   DateTime         @updatedAt
+  User        User[]
+}
+
+model PrivateNotification {
+  id          Int              @id @default(autoincrement())
+  title       String
+  preview     String?
+  content     String           @db.Text
+  attachment  String?          @db.Text
+  thumbnail   String?          @db.Text
+  link        String?          @db.Text
+  type        NotificationType @default(ANOTHER)
+  senderId    Int              @unique
+  sender      User             @relation("SenderPrivateRelation", fields: [senderId], references: [id], onDelete: Cascade)
+  recipientId Int              @unique
+  recipient   User             @relation("RecipientPrivateRelation", fields: [recipientId], references: [id], onDelete: Cascade)
+  metadata    Json?
+  deletedFlg  Boolean          @default(false)
+  deletedAt   DateTime?
+  createdBy   Int?
+  createdAt   DateTime         @default(now())
+  updatedBy   Int?
+  updatedAt   DateTime         @updatedAt
+  User        User[]
+}
+
 enum UserType {
   ADMIN
   STAFF
@@ -548,4 +623,17 @@ enum Languages {
   ENGLISH
   CHINESE
   JAPANESE
+}
+
+enum InitializedBy {
+  SYSTEM
+  USER
+}
+
+enum NotificationType {
+  EVENT
+  ADVERTISEMENT //Quang cao
+  ACCOUNT
+  WARNING
+  ANOTHER
 }

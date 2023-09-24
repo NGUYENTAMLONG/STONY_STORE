@@ -58,4 +58,9 @@ export const EXCEPTION_AUTH = {
     message: 'INVALIDTOKEN',
     code: 'auth012',
   },
+
+  DOES_NOT_HAVE_PERMISSION: {
+    messsage: 'YOU DOES NOT HAVE PERMISSION',
+    code: 'auth013',
+  },
 };

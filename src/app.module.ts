@@ -28,6 +28,7 @@ import { MailerService } from './mailer/mailer.service';
 import { RolesGuard } from './auth/guards/role.guard';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { PrismaClient } from '@prisma/client';
+import { UserSettingsModule } from './settings/settings.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { PrismaClient } from '@prisma/client';
     VouchersModule,
     EventsModule,
     RedisModule,
+    UserSettingsModule,
   ],
   controllers: [AppController],
   providers: [

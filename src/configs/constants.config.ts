@@ -378,6 +378,7 @@ export const COLORS = [
     imageName: 'C12-transparent.jpg',
   },
 ];
+
 export const SIZES = [
   {
     name: 'M',
@@ -485,6 +486,7 @@ export const SIZES = [
     description: 'Số đo cỡ chân giày dép',
   },
 ];
+
 export const MATERIALS = [
   {
     name: 'Jeans (Bò)',
@@ -653,5 +655,38 @@ export const MATERIALS = [
     description:
       'Có nguồn gốc từ nước Đức trong chiến tranh thế giới, vải giả da simili được cấu tạo từ các lớp lót làm dệt từ sợi polyester và lớp nhựa PVC. Có hình dạng giống như lớp da thật, vải giả da simili có khả năng chống nước cực tốt, độ bền của áo cũng cao khi thời gian sử dụng có thể kéo dài mấy năm. Trong thời trang thì các thiết kế từ vải giả da simili mang tính thẩm mỹ rất cao, sang trọng và lịch sự. Loại phải này còn phù hợp với nhiều đối tượng ở các độ tuổi khác nhau.',
     imageName: 'M23-simili.jpg',
+  },
+];
+
+export const CANCEL_ORDER_REASONS = [
+  {
+    code: 'R-01',
+    name: 'Muốn thay đổi địa chỉ giao hàng',
+    nameEN: 'Want to change delivery address',
+  },
+  {
+    code: 'R-02',
+    name: 'Muốn nhập/thay đổi mã voucher',
+    nameEN: 'Want to update voucher',
+  },
+  {
+    code: 'R-03',
+    name: 'Thủ tục thanh toán quá rắc rối',
+    nameEN: 'Payment procedures are too complicated',
+  },
+  {
+    code: 'R-04',
+    name: 'Tìm thấy giá rẻ hơn ở chỗ khác',
+    nameEN: 'Find cheaper prices elsewhere',
+  },
+  {
+    code: 'R-05',
+    name: 'Muốn thay đổi sản phẩm trong đơn hàng (size, màu sắc, số lượng, ...)',
+    nameEN: 'Change size, color, material, quantity,...',
+  },
+  {
+    code: 'R-06',
+    name: 'Đổi ý không muốn mua nữa',
+    nameEN: "Changed my mind, don't want to buy anymore",
   },
 ];

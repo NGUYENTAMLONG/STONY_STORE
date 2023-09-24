@@ -22,6 +22,7 @@ import {
   IsDeleteImageDto,
   RestoreMultipleDto,
   UpdateOrderDto,
+  UpdateOrderStatusDto,
 } from './dtos/orders.dto';
 import { diskStorage } from 'multer';
 import { editFileName } from 'src/helpers/file.helper';
@@ -90,6 +91,24 @@ export class OrdersController {
     @Body() payload: UpdateOrderDto,
   ) {
     return this.ordersService.updateOneOrder(orderId, payload);
+  }
+
+  @Patch(':id/change-status')
+  @Roles(UserType.CUSTOMER)
+  @UseGuards(JwtAuthGuard)
+  public async updateOrderStatus(
+    @Request() req,
+    @Param('id', new ParseIntPipe({ optional: true })) orderId: number,
+    @Body() payload: UpdateOrderStatusDto,
+  ) {
+    return this.ordersService.updateOneOrderStatus(req.user, orderId, payload);
+  }
+
+  @Patch(':id/cancel-order')
+  @Roles(UserType.CUSTOMER, UserType.ADMIN)
+  @UseGuards(JwtAuthGuard)
+  public async cancelOrder() {
+    return 'OK';
   }
 
   @Get(':id')

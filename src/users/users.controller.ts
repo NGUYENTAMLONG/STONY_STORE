@@ -9,6 +9,9 @@ import {
   Put,
   Query,
   UseGuards,
+  Request,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
@@ -19,13 +22,20 @@ import {
 import { UpdateProfileDto } from './dtos/profile.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { AuthorizationGuard } from 'src/auth/guards/authorization.guard';
-import { UpdateSettingDto } from './dtos/setting.dto';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { UserType } from '@prisma/client';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { imageFileFilter } from 'src/validators/validation-file';
+import { diskStorage } from 'multer';
+import { editFileName } from 'src/helpers/file.helper';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get('')
+  @UseGuards(JwtAuthGuard)
+  @Roles()
   // @UseGuards(AuthorizationGuard)
   public async getUserList(
     @Query('page', new ParseIntPipe({ optional: true })) page: number = 1,
@@ -39,11 +49,11 @@ export class UsersController {
     };
   }
 
-  @Get('/:id')
-  public async getUserById(
-    @Param('id', new ParseIntPipe({ optional: true })) id: number,
-  ) {
-    const user = await this.usersService.findUserById(id);
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  @Roles(UserType.CUSTOMER)
+  public async getUserByMyself(@Request() req) {
+    const user = await this.usersService.findUserByMySelf(req.user);
     return user;
   }
 
@@ -59,21 +69,23 @@ export class UsersController {
     return user;
   }
 
-  @Put('/update-profile/:id')
+  @Get('/:id')
+  @UseGuards(JwtAuthGuard)
+  @Roles()
+  public async getUserById(
+    @Param('id', new ParseIntPipe({ optional: true })) id: number,
+  ) {
+    const user = await this.usersService.findUserById(id);
+    return user;
+  }
+  @Put('/update-profile')
+  @Roles(UserType.CUSTOMER)
+  @UseGuards(JwtAuthGuard)
   public async updateProfile(
-    @Param(':id', new ParseIntPipe({ optional: true })) id: number,
+    @Request() req,
     @Body() payload: UpdateProfileDto,
   ) {
-    const result = await this.usersService.updateProfile(id, payload);
-    return result;
-  }
-
-  @Put('/update-setting/:id')
-  public async updateSetting(
-    @Param(':id', new ParseIntPipe({ optional: true })) id: number,
-    @Body() payload: UpdateSettingDto,
-  ) {
-    const result = await this.usersService.updateSetting(id, payload);
+    const result = await this.usersService.updateProfile(req.user, payload);
     return result;
   }
 
@@ -113,6 +125,29 @@ export class UsersController {
   @Delete('/force-delete-many')
   public async forceDeleteUsers(@Body() payload: UserIdArrayDto) {
     const result = await this.usersService.forceDeleteMultiple(payload);
+    return result;
+  }
+
+  @Patch('/update-avatar')
+  @UseGuards(JwtAuthGuard)
+  @Roles(UserType.CUSTOMER)
+  @UseInterceptors(
+    FileInterceptor('avatar', {
+      limits: {
+        fileSize: 5000000,
+      },
+      fileFilter: imageFileFilter,
+      storage: diskStorage({
+        destination: './src/public/avatars',
+        filename: editFileName,
+      }),
+    }),
+  )
+  public async updateAvatarProfile(
+    @Request() req,
+    @UploadedFile() avatar: Express.Multer.File,
+  ) {
+    const result = await this.usersService.updateAvatar(req.user, avatar);
     return result;
   }
 }
