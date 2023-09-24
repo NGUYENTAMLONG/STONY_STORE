@@ -78,6 +78,7 @@ export class UsersController {
     const user = await this.usersService.findUserById(id);
     return user;
   }
+
   @Put('/update-profile')
   @Roles(UserType.CUSTOMER)
   @UseGuards(JwtAuthGuard)
@@ -148,6 +149,23 @@ export class UsersController {
     @UploadedFile() avatar: Express.Multer.File,
   ) {
     const result = await this.usersService.updateAvatar(req.user, avatar);
+    return result;
+  }
+
+  // ________________________ Purchase History________________________
+  @Get('/history/purchase')
+  @Roles(UserType.CUSTOMER)
+  @UseGuards(JwtAuthGuard)
+  public async getPurchaseHistory(
+    @Request() req,
+    @Query('page', new ParseIntPipe({ optional: true })) page?,
+    @Query('limit', new ParseIntPipe({ optional: true })) limit?,
+  ) {
+    const result = await this.usersService.findPurchaseHistory(
+      req.user,
+      page,
+      limit,
+    );
     return result;
   }
 }

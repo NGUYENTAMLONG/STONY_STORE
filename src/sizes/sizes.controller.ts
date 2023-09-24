@@ -10,6 +10,8 @@ import {
   Query,
   UseInterceptors,
   UploadedFile,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { Controller } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -21,6 +23,9 @@ import {
   UpdateSizeDto,
 } from './dtos/sizes.dto';
 import { SizesService } from './sizes.service';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { UserType } from '@prisma/client';
 @Controller('sizes')
 export class SizesController {
   constructor(private readonly sizesService: SizesService) {}
@@ -39,8 +44,10 @@ export class SizesController {
   }
 
   @Post()
-  public async createSize(@Body() payload: CreateSizeDto) {
-    return this.sizesService.createOneSize(payload);
+  @Roles(UserType.STAFF)
+  @UseGuards(JwtAuthGuard)
+  public async createSize(@Body() payload: CreateSizeDto, @Request() req) {
+    return this.sizesService.createOneSize(payload, req.user);
   }
 
   @Patch('/restore/:id')
