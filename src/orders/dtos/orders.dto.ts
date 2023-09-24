@@ -1,8 +1,10 @@
+import { OrderStatus } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
   ArrayNotEmpty,
   IsArray,
   IsBoolean,
+  IsEnum,
   IsInt,
   IsJSON,
   IsNotEmpty,
@@ -77,6 +79,12 @@ export class UpdateOrderDto {
   metadata?: Record<string, any>;
 }
 
+export class UpdateOrderStatusDto {
+  @IsEnum(OrderStatus)
+  @IsNotEmpty()
+  @IsString()
+  status: string;
+}
 // export class UploadFileDto {
 //   //   @ApiProperty({ type: 'string', format: 'binary' })
 //   @IsNotEmpty()

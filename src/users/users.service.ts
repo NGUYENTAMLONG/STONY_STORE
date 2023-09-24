@@ -86,8 +86,8 @@ export class UsersService {
             },
           },
           shippingAddress: true,
-          Favorite: true,
-          PurchaseHistory: true,
+          favorite: true,
+          purchaseHistory: true,
           setting: true,
         },
       });

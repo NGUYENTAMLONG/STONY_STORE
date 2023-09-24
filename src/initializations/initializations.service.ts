@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { config } from 'dotenv';
 import {
+  CANCEL_ORDER_REASONS,
   CATEGORIES,
   COLORS,
   MATERIALS,
@@ -118,10 +119,11 @@ export class InitializationsService implements OnModuleInit {
       return error;
     }
   }
+
   private async initalCatgories() {
     try {
       const countExistedCategories = await this.prisma.category.count();
-      const a = await this.prisma.subCategory.findMany({}); //
+      // const a = await this.prisma.subCategory.findMany({}); //
       if (countExistedCategories === 0) {
         for (const category of CATEGORIES) {
           let createdCategory = await this.prisma.category.create({
@@ -150,6 +152,27 @@ export class InitializationsService implements OnModuleInit {
               }); //
             }
           }
+        }
+      }
+      console.log('👘👖👠👡👞 Initialized categories Successful !!! 👒🎩👟👢 ');
+    } catch (error) {
+      console.log({ initialCategoriesError: error });
+      return error;
+    }
+  }
+
+  private async initalCancelOrderReasons() {
+    try {
+      const countExistedReasons = await this.prisma.cancelOrderReason.count();
+      // const a = await this.prisma.subCategory.findMany({}); //
+      if (countExistedReasons === 0) {
+        for (const reason of CANCEL_ORDER_REASONS) {
+          let createReason = await this.prisma.cancelOrderReason.create({
+            data: {
+              reason: reason.name,
+              orderId: 0,
+            },
+          });
         }
       }
       console.log('👘👖👠👡👞 Initialized categories Successful !!! 👒🎩👟👢 ');

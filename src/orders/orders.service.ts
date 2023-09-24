@@ -3,7 +3,7 @@ import {
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaClient, User } from '@prisma/client';
+import { OrderStatus, PrismaClient, User } from '@prisma/client';
 import { Order } from '@prisma/client';
 import {
   CreateOrderDto,
@@ -11,11 +11,13 @@ import {
   IsDeleteImageDto,
   RestoreMultipleDto,
   UpdateOrderDto,
+  UpdateOrderStatusDto,
 } from './dtos/orders.dto';
 import { EXCEPTION_ORDER } from './constants/order.constant';
 import { v4 as uuidv4 } from 'uuid';
 import { EXCEPTION_ADDRESS } from 'src/addresses/constants/address.constant';
 import { validatePhoneNumber } from 'src/helpers/validate.helper';
+import { EXCEPTION_AUTH } from 'src/auth/constants/auth.constant';
 
 @Injectable()
 export class OrdersService {
@@ -169,6 +171,49 @@ export class OrdersService {
       //   return updateBanner;
     } catch (error) {
       console.log({ updateOrderError: error });
+      return error;
+    }
+  }
+
+  public async updateOneOrderStatus(
+    userReq: User,
+    orderId: number,
+    payload: UpdateOrderStatusDto,
+  ): Promise<Order> {
+    try {
+      const { status } = payload;
+      const foundOrder = await this.prisma.order.findFirst({
+        where: {
+          id: orderId,
+        },
+      });
+
+      if (!foundOrder) {
+        throw new BadRequestException(EXCEPTION_ORDER.ORDER_NOT_FOUND);
+      }
+
+      if (
+        !userReq.isAdministrator &&
+        userReq.userType !== 'ADMIN' &&
+        foundOrder.createdBy !== userReq.id &&
+        foundOrder.customerId !== userReq.id
+      ) {
+        throw new BadRequestException(EXCEPTION_AUTH.DOES_NOT_HAVE_PERMISSION);
+      }
+
+      const updateOrderStatus = await this.prisma.order.update({
+        where: {
+          id: orderId,
+        },
+        data: {
+          status: OrderStatus[status],
+          updatedBy: userReq.id,
+        },
+      });
+
+      return updateOrderStatus;
+    } catch (error) {
+      console.log({ updateOrderStatusError: error });
       return error;
     }
   }
