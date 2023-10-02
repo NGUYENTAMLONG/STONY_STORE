@@ -33,18 +33,20 @@ model User {
   order           Order[]
   contact         Contact[]
   reviews         Review[]
+  posts           Post[]
   purchaseHistory PurchaseHistory?
   favorite        Favorite?
 
-  publicNotificationsSent     PublicNotification[] @relation("SenderRelation")
-  publicNotificationsReceived PublicNotification[] @relation("RecipientRelation")
-  PublicNotification          PublicNotification?  @relation(fields: [publicNotificationId], references: [id])
-  publicNotificationId        Int?
+  publicNotificationsSent PublicNotification[] @relation("SenderRelation")
+  // publicNotificationsReceived PublicNotification[] @relation("RecipientRelation")
+  // PublicNotification      PublicNotification?  @relation(fields: [publicNotificationId], references: [id])
+  // publicNotificationId    Int?
 
   PrivateNotificationSent     PrivateNotification[] @relation("SenderPrivateRelation")
   PrivateNotificationReceived PrivateNotification[] @relation("RecipientPrivateRelation")
   PrivateNotification         PrivateNotification?  @relation(fields: [privateNotificationId], references: [id])
   privateNotificationId       Int?
+  sessions                    Session[]             @relation("UserSession")
 }
 
 model UserSetting {
@@ -527,26 +529,25 @@ model CancelOrderReason {
 }
 
 model PublicNotification {
-  id          Int              @id @default(autoincrement())
-  title       String
-  preview     String?
-  content     String           @db.Text
-  attachment  String?          @db.Text
-  thumbnail   String?          @db.Text
-  link        String?          @db.Text
-  senderId    Int              @unique
-  type        NotificationType @default(ANOTHER)
-  sender      User             @relation("SenderRelation", fields: [senderId], references: [id], onDelete: Cascade)
-  recipientId Int              @unique
-  recipient   User             @relation("RecipientRelation", fields: [recipientId], references: [id], onDelete: Cascade)
-  metadata    Json?
-  deletedFlg  Boolean          @default(false)
-  deletedAt   DateTime?
-  createdBy   Int?
-  createdAt   DateTime         @default(now())
-  updatedBy   Int?
-  updatedAt   DateTime         @updatedAt
-  User        User[]
+  id         Int              @id @default(autoincrement())
+  title      String
+  preview    String?
+  content    String           @db.Text
+  attachment String?          @db.Text
+  thumbnail  String?          @db.Text
+  link       String?          @db.Text
+  senderId   Int              @unique
+  type       NotificationType @default(ANOTHER)
+  sender     User             @relation("SenderRelation", fields: [senderId], references: [id], onDelete: Cascade)
+  metadata   Json?
+  deletedFlg Boolean          @default(false)
+  deletedAt  DateTime?
+  createdBy  Int?
+  createdAt  DateTime         @default(now())
+  updatedBy  Int?
+  updatedAt  DateTime         @updatedAt
+  // userId     Int?
+  // User       User?            @relation(fields: [userId], references: [id])
 }
 
 model PrivateNotification {
@@ -570,6 +571,107 @@ model PrivateNotification {
   updatedBy   Int?
   updatedAt   DateTime         @updatedAt
   User        User[]
+}
+
+model PostCategory {
+  id           Int                 @id @default(autoincrement())
+  name         String
+  nameEN       String?
+  description  String?             @db.Text
+  introduction String?
+  metadata     Json?
+  thumbnail    String?
+  posts        CategoriesOnPosts[]
+  deletedFlg   Boolean             @default(false)
+  deletedAt    DateTime?
+  createdBy    Int?
+  createdAt    DateTime            @default(now())
+  updatedBy    Int?
+  updatedAt    DateTime            @updatedAt
+}
+
+model Post {
+  id         Int                 @id @default(autoincrement())
+  title      String
+  content    String              @db.Text
+  attachment String?             @db.Text
+  thumbnail  String?             @db.Text
+  link       String?             @db.Text
+  authorId   Int
+  author     User                @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  type       NotificationType    @default(ANOTHER)
+  categories CategoriesOnPosts[]
+  keywords   PostKeyword[] // Sử dụng bảng liên kết PostKeyword
+  metadata   Json?
+  deletedFlg Boolean             @default(false)
+  deletedAt  DateTime?
+  createdBy  Int?
+  createdAt  DateTime            @default(now())
+  updatedBy  Int?
+  updatedAt  DateTime            @updatedAt
+}
+
+model CategoriesOnPosts {
+  post       Post         @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId     Int // relation scalar field (used in the `@relation` attribute above)
+  category   PostCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId Int // relation scalar field (used in the `@relation` attribute above)
+  assignedAt DateTime     @default(now())
+  assignedBy String
+
+  @@id([postId, categoryId])
+}
+
+model Keyword {
+  id         Int           @id @default(autoincrement())
+  value      String
+  posts      PostKeyword[] // Sử dụng bảng liên kết PostKeyword
+  metadata   Json?
+  deletedFlg Boolean       @default(false)
+  deletedAt  DateTime?
+  createdBy  Int?
+  createdAt  DateTime      @default(now())
+  updatedBy  Int?
+  updatedAt  DateTime      @updatedAt
+}
+
+model PostKeyword {
+  id         Int       @id @default(autoincrement())
+  postId     Int
+  post       Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  keywordId  Int
+  keyword    Keyword   @relation(fields: [keywordId], references: [id], onDelete: Cascade)
+  metadata   Json?
+  deletedFlg Boolean   @default(false)
+  deletedAt  DateTime?
+  createdBy  Int?
+  createdAt  DateTime  @default(now())
+  updatedBy  Int?
+  updatedAt  DateTime  @updatedAt
+}
+
+model Session {
+  id              Int       @id @default(autoincrement())
+  ipAddress       String
+  token           String
+  userAgent       String?
+  city            String?
+  region          String?
+  timezone        String?
+  countryCode     String?
+  browser         String?
+  operatingSystem String?
+  userId          Int
+  user            User      @relation("UserSession", fields: [userId], references: [id])
+  metadata        Json?
+  deletedFlg      Boolean   @default(false)
+  deletedAt       DateTime?
+  createdBy       Int?
+  createdAt       DateTime  @default(now())
+  updatedBy       Int?
+  updatedAt       DateTime  @updatedAt
+
+  @@index([userId])
 }
 
 enum UserType {

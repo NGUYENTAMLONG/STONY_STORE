@@ -174,6 +174,16 @@ export class ProductsService {
         hot,
         ...rest
       } = payload;
+      //check
+      const founDuplicateCode = await this.prisma.product.findFirst({
+        where: {
+          code: code,
+        },
+      });
+      if (founDuplicateCode) {
+        throw new BadRequestException(EXCEPTION_PRODUCT.PRODUCT_CODE_EXISTED);
+      }
+      //
       const createdProduct = await this.prisma.product.create({
         data: {
           name,
@@ -307,7 +317,7 @@ export class ProductsService {
       //Check Order has product ?
       //Check Category/Subcategory has product ?
       //Check Event has product ?
-      const softDeletedProduct = await this.prisma.user.update({
+      const softDeletedProduct = await this.prisma.product.update({
         where: {
           id: productId,
         },

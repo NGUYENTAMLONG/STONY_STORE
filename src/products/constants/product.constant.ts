@@ -27,4 +27,8 @@ export const EXCEPTION_PRODUCT = {
     message: 'PRODUCT DOES NOT EXIST',
     code: 'Product007',
   },
+  PRODUCT_CODE_EXISTED: {
+    message: 'PRODUCT CODE EXISTED',
+    code: 'Product008',
+  },
 };
