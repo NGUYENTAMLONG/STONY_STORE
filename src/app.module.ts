@@ -29,6 +29,8 @@ import { RolesGuard } from './auth/guards/role.guard';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { PrismaClient } from '@prisma/client';
 import { UserSettingsModule } from './settings/settings.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { PostsModule } from './posts/posts.module';
 
 @Module({
   imports: [
@@ -55,6 +57,8 @@ import { UserSettingsModule } from './settings/settings.module';
     EventsModule,
     RedisModule,
     UserSettingsModule,
+    NotificationsModule,
+    PostsModule,
   ],
   controllers: [AppController],
   providers: [

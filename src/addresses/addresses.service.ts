@@ -3,7 +3,7 @@ import {
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
-import { Address, PrismaClient } from '@prisma/client';
+import { Address, PrismaClient, User } from '@prisma/client';
 import {
   CreateAddressDto,
   DeleteMultipleDto,
@@ -36,7 +36,10 @@ export class AddressesService {
     }
   }
 
-  public async createOneAddress(payload: CreateAddressDto): Promise<Address> {
+  public async createOneAddress(
+    payload: CreateAddressDto,
+    userReq: User,
+  ): Promise<Address>{
     try {
       const {
         userId,
@@ -57,6 +60,7 @@ export class AddressesService {
           street,
           detailAddress,
           metadata: metadata,
+          createdBy: userReq.id,
         },
       });
       return createAddress;

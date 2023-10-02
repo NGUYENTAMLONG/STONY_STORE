@@ -8,6 +8,8 @@ import {
   Patch,
   Put,
   Query,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { Controller } from '@nestjs/common';
 import {
@@ -17,6 +19,9 @@ import {
   UpdateAddressDto,
 } from './dtos/addresses.dto';
 import { AddressesService } from './addresses.service';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { UserType } from '@prisma/client';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('addresses')
 export class AddressesController {
@@ -36,8 +41,13 @@ export class AddressesController {
   }
 
   @Post()
-  public async createAddress(@Body() payload: CreateAddressDto) {
-    return this.addressesService.createOneAddress(payload);
+  @Roles(UserType.CUSTOMER)
+  @UseGuards(JwtAuthGuard)
+  public async createAddress(
+    @Body() payload: CreateAddressDto,
+    @Request() req,
+  ) {
+    return this.addressesService.createOneAddress(payload, req.user);
   }
 
   @Patch('/restore/:id')

@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaClient, Role, User } from '@prisma/client';
+import { PrismaClient, PurchaseHistory, Role, User } from '@prisma/client';
 import {
   ChangePasswordDto,
   ChangeUsernameDto,
@@ -355,6 +355,36 @@ export class UsersService {
       }
       return { status: 201, message: 'UPDATE AVATAR SUCCESSFUL' };
     } catch (error) {
+      return error;
+    }
+  }
+  // ________________________ Purchase History________________________
+
+  public async findPurchaseHistory(
+    customer: User,
+    page?: number,
+    limit?: number,
+  ): Promise<PurchaseHistory> {
+    try {
+      page = page > 0 ? page : 1;
+      limit = limit > 0 ? limit : 10;
+      const offset = (page - 1) * limit;
+
+      const foundPurchaseHistory = await this.prisma.purchaseHistory.findFirst({
+        where: {
+          userId: customer.id,
+        },
+        include: {
+          orders: {
+            skip: offset,
+            take: limit,
+          },
+        },
+      });
+
+      return foundPurchaseHistory;
+    } catch (error) {
+      console.log({ ErrorFindPurchaseHistory: error });
       return error;
     }
   }

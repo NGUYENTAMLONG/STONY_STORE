@@ -18,6 +18,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { EXCEPTION_ADDRESS } from 'src/addresses/constants/address.constant';
 import { validatePhoneNumber } from 'src/helpers/validate.helper';
 import { EXCEPTION_AUTH } from 'src/auth/constants/auth.constant';
+import { EXCEPTION_USER } from 'src/users/constants/user.contant';
 
 @Injectable()
 export class OrdersService {
@@ -55,6 +56,9 @@ export class OrdersService {
           deletedFlg: false,
           createdBy: customer.id,
         },
+        include: {
+          items: true,
+        },
         skip: offset,
         take: limit,
       });
@@ -68,7 +72,7 @@ export class OrdersService {
   public async createOneOrder(
     customer: User,
     payload: CreateOrderDto,
-  ): Promise<Order> {
+  ): Promise<any> {
     try {
       const {
         addressId,
@@ -80,6 +84,20 @@ export class OrdersService {
         subtotal,
         items,
       } = payload;
+      const foundCustomer = await this.prisma.user.findFirst({
+        where: {
+          id: customer.id,
+          isActive: true,
+          deletedAt: null,
+          deletedFlg: false,
+        },
+        include: {
+          purchaseHistory: true,
+        },
+      });
+      if (!foundCustomer) {
+        throw new BadRequestException(EXCEPTION_USER.USER_NOT_FOUND);
+      }
 
       const foundAddress = await this.prisma.address.findFirst({
         where: {
@@ -92,10 +110,10 @@ export class OrdersService {
         throw new BadRequestException(EXCEPTION_ADDRESS.ADDRESS_NOT_FOUND);
       }
 
-      const phoneNumberIsValid = validatePhoneNumber(phoneRecipient);
-      if (!phoneNumberIsValid) {
-        throw new BadRequestException(EXCEPTION_ORDER.PHONE_NUMBER_IS_INVALID);
-      }
+      // const phoneNumberIsValid = validatePhoneNumber(phoneRecipient);
+      // if (!phoneNumberIsValid) {
+      //   throw new BadRequestException(EXCEPTION_ORDER.PHONE_NUMBER_IS_INVALID);
+      // }
       let metadata = {};
       if (note) {
         metadata['note'] = note;
@@ -113,13 +131,14 @@ export class OrdersService {
           tax,
           phoneDeliver,
           subtotal: Number(subtotal),
-          // purchaseHistoryId:1
+          purchaseHistoryId: foundCustomer.purchaseHistory.id,
         },
       });
 
+      const createdOrderItems = [];
       for (const item of items) {
         const { productId, quantity, variantId } = item;
-        const createOrderItem = this.prisma.orderItem.create({
+        const createOrderItem = await this.prisma.orderItem.create({
           data: {
             productId,
             variantId,
@@ -128,14 +147,9 @@ export class OrdersService {
             createdBy: customer.id,
           },
         });
+        createdOrderItems.push(createOrderItem);
       }
-      //   const createOrder = await this.prisma.order.create({
-      //     data: {
-      //       description,
-      //       metadata: metadata,
-      //     },
-      //   });
-      //   return createOrder;
+      return createdOrderItems;
     } catch (error) {
       console.log({ createOrderError: error });
       return error;

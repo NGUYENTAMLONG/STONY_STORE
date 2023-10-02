@@ -30,7 +30,7 @@ export class SizesService {
     }
   }
 
-  public async createOneSize(payload: CreateSizeDto): Promise<Size> {
+  public async createOneSize(payload: CreateSizeDto, userReq): Promise<Size> {
     try {
       const { name, description, metadata } = payload;
       const createSize = await this.prisma.size.create({
@@ -38,6 +38,7 @@ export class SizesService {
           name,
           description,
           metadata: metadata,
+          createdBy: userReq.id,
         },
       });
       return createSize;
