@@ -104,6 +104,12 @@ export const CATEGORIES = [
         description: '',
         descriptionEN: '',
       },
+      {
+        name: 'Áo thể thao',
+        nameEN: 'sport shirt',
+        description: '',
+        descriptionEN: '',
+      },
     ],
   },
   {
@@ -215,6 +221,12 @@ export const CATEGORIES = [
       {
         name: 'Dép kẹp',
         nameEN: 'flip flops',
+        description: '',
+        descriptionEN: '',
+      },
+      {
+        name: 'Dép lê',
+        nameEN: 'slippers',
         description: '',
         descriptionEN: '',
       },
@@ -578,13 +590,6 @@ export const MATERIALS = [
     description:
       'Vải nylon loại vải thuộc nhóm Polyamide được chế tạo từ các loại hóa chất, nó cũng được dệt từ các sợi tổng hợp mà nên..  Chất liệu của vải ni lông không được đánh giá cao bởi chúng không thể phân hủy trong môi trường.',
     imageName: 'M13-nylon.jpg',
-  },
-  {
-    name: 'Vải tuyết mưa',
-    nameEN: 'VPNS',
-    description:
-      'Vải tuyết mưa được dệt nên từ nhiều loại sợi khác nhau như Viscose, Polyester Nylon và sợi Spandex.Vải vô cùng chắc chắn, có độ co giãn phù hợp, không quá dày và quá mỏng, thấm hút mồ hôi tốt và tạo được sự thoáng mát cho người đọc. Độ bền của vải cũng được đánh giá cao, ít bị nhăn hay bám bụi khi mặc.',
-    imageName: 'M14-vpns.jpg',
   },
   {
     name: 'Vải tuyết mưa',

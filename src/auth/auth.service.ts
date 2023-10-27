@@ -238,6 +238,7 @@ export class AuthService {
 
   public decode(token: string) {
     try {
+      console.log(token);
       const jwt = token.replace('Bearer ', '');
       return this.jwtService.decode(jwt) as JwtPayload;
     } catch (e) {

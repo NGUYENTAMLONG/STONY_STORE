@@ -1,8 +1,14 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Post, PrismaClient, User } from '@prisma/client';
+import { Post, PostCategory, PrismaClient, User } from '@prisma/client';
 import { EXCEPTION_POST } from './constants/post.constant';
-import { CreatePostDto, UpdatePostDto } from './dtos/post.dtos';
+import {
+  CreatePostCategoryDto,
+  CreatePostDto,
+  UpdatePostCategoryDto,
+  UpdatePostDto,
+} from './dtos/post.dtos';
 import * as fs from 'fs';
+import { EXCEPTION_CATEGORY } from 'src/categories/constants/category.constant';
 
 @Injectable()
 export class PostsService {
@@ -22,6 +28,21 @@ export class PostsService {
       return posts;
     } catch (error) {
       console.log({ getPostListError: error });
+      return error;
+    }
+  }
+
+  public async getPostCategory(): Promise<PostCategory[]> {
+    try {
+      const postCategries = await this.prisma.postCategory.findMany({
+        where: {
+          deletedAt: null,
+          deletedFlg: false,
+        },
+      });
+      return postCategries;
+    } catch (error) {
+      console.log({ getPostCategoryError: error });
       return error;
     }
   }
@@ -278,6 +299,101 @@ export class PostsService {
       return forceDeletedUser;
     } catch (error) {
       console.log({ forceDeleteError: error });
+      return error;
+    }
+  }
+  // __________ Post Category _______
+  public async createOneCategory(
+    payload: CreatePostCategoryDto,
+    thumbnail?: Express.Multer.File,
+  ): Promise<PostCategory> {
+    try {
+      const { name, nameEN, description, metadata } = payload;
+      const {
+        fieldname,
+        mimetype,
+        originalname,
+        size,
+        buffer,
+        filename,
+        destination,
+      } = thumbnail;
+      const createPostCategory = await this.prisma.postCategory.create({
+        data: {
+          name,
+          nameEN,
+          description,
+          thumbnail: `/images/categories/${filename}`,
+          metadata: metadata,
+        },
+      });
+      return createPostCategory;
+    } catch (error) {
+      console.log({ createPostCategoryError: error });
+      return error;
+    }
+  }
+  public async updateOneCategory(
+    categoryId: number,
+    payload: UpdatePostCategoryDto,
+    thumbnail?: Express.Multer.File,
+  ): Promise<PostCategory> {
+    try {
+      const { name, nameEN, description, metadata } = payload;
+      const foundCategory = await this.prisma.category.findFirst({
+        where: {
+          id: categoryId,
+        },
+      });
+      if (!foundCategory) {
+        throw new BadRequestException(EXCEPTION_CATEGORY.CATEGORY_NOT_FOUND);
+      }
+      let data = {
+        name,
+        nameEN,
+        description,
+        metadata: metadata,
+      };
+      if (thumbnail?.filename) {
+        data['thumbnail'] = `/images/categories/${thumbnail.filename}`;
+      }
+      const updateCategory = await this.prisma.category.update({
+        where: {
+          id: categoryId,
+        },
+        data,
+      });
+      return updateCategory;
+    } catch (error) {
+      console.log({ updateCategoryError: error });
+      return error;
+    }
+  }
+
+  public async restoreOneCategory(categoryId: number): Promise<PostCategory> {
+    try {
+      const foundCategory = await this.prisma.postCategory.findFirst({
+        where: {
+          id: categoryId,
+          deletedFlg: true,
+        },
+      });
+      if (!foundCategory) {
+        throw new BadRequestException(EXCEPTION_CATEGORY.CATEGORY_NOT_FOUND);
+      }
+
+      const restoreCategoryById = await this.prisma.category.update({
+        where: {
+          id: categoryId,
+        },
+        data: {
+          deletedFlg: false,
+          deletedAt: null,
+        },
+      });
+      return restoreCategoryById;
+    } catch (error) {
+      console.log({ restorePostCategoryByIdError: error });
       return error;
     }
   }

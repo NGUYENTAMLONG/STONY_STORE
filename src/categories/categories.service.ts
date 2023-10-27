@@ -43,6 +43,25 @@ export class CategoriesService {
       return error;
     }
   }
+
+  public async getAllCategories(): Promise<Category[]> {
+    try {
+      const categories = await this.prisma.category.findMany({
+        where: {
+          deletedAt: null,
+          deletedFlg: false,
+        },
+        include: {
+          subCategory: true,
+        },
+      });
+
+      return categories;
+    } catch (error) {
+      console.log({ getAllCategoryError: error });
+      return error;
+    }
+  }
   public async getSubList(page: number, limit: number): Promise<SubCategory[]> {
     try {
       const offset = (page - 1) * limit;
@@ -76,6 +95,13 @@ export class CategoriesService {
         },
         include: {
           products: {
+            include: {
+              variants: {
+                include: {
+                  color: true,
+                },
+              },
+            },
             skip: offset,
             take: limit,
           },
@@ -201,6 +227,9 @@ export class CategoriesService {
           id: categoryId,
           deletedAt: null,
           deletedFlg: false,
+        },
+        include: {
+          subCategory: true,
         },
       });
       return foundCategoryById;

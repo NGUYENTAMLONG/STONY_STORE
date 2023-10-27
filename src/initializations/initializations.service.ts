@@ -65,7 +65,8 @@ export class InitializationsService implements OnModuleInit {
             data: {
               name: color.name,
               nameEN: color.nameEN,
-              image: `${process.env.BASE_URI}:${process.env.PORT}/images/colors/${color.imageName}`,
+              // image: `${process.env.BASE_URI}:${process.env.PORT}/images/colors/${color.imageName}`,
+              image: `/images/colors/${color.imageName}`,
               description: color.description,
             },
           });
@@ -107,7 +108,8 @@ export class InitializationsService implements OnModuleInit {
             data: {
               name: material.name,
               // nameEN: material.nameEN,
-              image: `${process.env.BASE_URI}:${process.env.PORT}/images/materials/${material.imageName}`,
+              // image: `${process.env.BASE_URI}:${process.env.PORT}/images/materials/${material.imageName}`,
+              image: `/images/materials/${material.imageName}`,
               description: material.description,
             },
           });

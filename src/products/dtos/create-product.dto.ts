@@ -1,7 +1,7 @@
 // import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
   IsBoolean,
-  IsBooleanString,
   IsNotEmpty,
   IsNumberString,
   IsOptional,
@@ -19,38 +19,50 @@ export class CreateProductDto {
 
   @IsNumberString()
   @IsNotEmpty()
+  // @Transform((value) => Number(value))
   price: number;
 
   @IsString()
   @IsOptional()
   description: string;
 
+  @IsString()
+  @IsOptional()
+  brand: string;
+
   @IsNumberString()
   @IsOptional()
+  // @Transform((value) => Number(value))
   importPrice: number;
 
   @IsNumberString()
   @IsOptional()
+  // @Transform((value) => Number(value))
   tax: number;
 
   @IsNumberString()
   @IsOptional()
+  // @Transform((value) => Number(value))
   discount: number;
 
   @IsBoolean()
   @IsOptional()
+  // @Transform((value) => Boolean(value))
   new?: boolean;
 
-  @IsBooleanString()
-  @IsNotEmpty()
+  @IsBoolean()
+  @IsOptional()
+  // @Transform((value) => Boolean(value))
   hot: boolean;
 
   @IsNumberString()
   @IsNotEmpty()
+  // @Transform((value) => Number(value))
   categoryId: number;
 
   @IsNumberString()
   @IsNotEmpty()
+  // @Transform((value) => Number(value))
   subCategoryId: number;
 
   // @IsNotEmpty()

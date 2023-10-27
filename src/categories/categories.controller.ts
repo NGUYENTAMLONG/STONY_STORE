@@ -43,6 +43,14 @@ export class CategoriesController {
     };
   }
 
+  @Get('all')
+  public async getAllCategory() {
+    const categories = await this.categoriesService.getAllCategories();
+    return {
+      data: categories,
+    };
+  }
+
   @Get('sub-category')
   public async getSubCategoryList(
     @Query('page', new ParseIntPipe({ optional: true })) page: number = 1,

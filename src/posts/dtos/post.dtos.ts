@@ -4,6 +4,7 @@ import {
   IsArray,
   IsBoolean,
   IsBooleanString,
+  IsJSON,
   IsNotEmpty,
   IsNumberString,
   IsOptional,
@@ -63,4 +64,42 @@ export class UpdatePostDto {
   @IsString()
   @IsOptional()
   link?: string;
+}
+
+// Post Category
+
+export class CreatePostCategoryDto {
+  @IsString()
+  @IsOptional()
+  name?: string;
+
+  @IsString()
+  @IsOptional()
+  nameEN?: string;
+
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @IsOptional()
+  @IsJSON()
+  metadata?: Record<string, any>;
+}
+
+export class UpdatePostCategoryDto {
+  @IsString()
+  @IsOptional()
+  name?: string;
+
+  @IsString()
+  @IsOptional()
+  nameEN?: string;
+
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @IsOptional()
+  @IsJSON()
+  metadata?: Record<string, any>;
 }

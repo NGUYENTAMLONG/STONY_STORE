@@ -35,11 +35,17 @@ export class ProductsController {
   public async getList(
     @Query('page', new ParseIntPipe({ optional: true })) page: number = 1,
     @Query('limit', new ParseIntPipe({ optional: true })) limit: number = 10,
+    @Query('query') query: string,
   ) {
-    const products = await this.productsService.getList(page, limit);
+    const { products, total } = await this.productsService.getList(
+      page,
+      limit,
+      query,
+    );
     return {
       page,
       limit,
+      total,
       data: products,
     };
   }
@@ -97,17 +103,43 @@ export class ProductsController {
   )
   public async createProduct(
     @Request() req,
-    @Body() payload: CreateProductDto,
-    @UploadedFile() thumbnail: Express.Multer.File,
+    @UploadedFile() thumbnail,
+    @Body() payload:CreateProductDto,
     @Body() variants?: CreateProductVariantDto[],
   ) {
-    return this.productsService.createOneProduct(
-      req.user,
-      payload,
-      thumbnail,
-      variants,
-    );
+    console.log('thumbnail', thumbnail);
+    console.log('payload', payload);
+    return payload;
+    // return this.productsService.createOneProduct(
+    //   req.user,
+    //   payload,
+    //   thumbnail,
+    //   variants,
+    // );
   }
+  // TESTTTTTTTTTTTTT
+  // @Post('upload')
+  // @UseInterceptors(
+  //   FileInterceptor('thumbnail', {
+  //     // Enable file size limits
+  //     limits: {
+  //       fileSize: 5000000, //(5MB) //+process.env.MAX_FILE_SIZE,
+  //     },
+  //     fileFilter: imageFileFilter,
+  //     storage: diskStorage({
+  //       destination: './src/public/images/thumbnails',
+  //       filename: editFileName,
+  //     }),
+  //   }),
+  // )
+  // async uploadFile(@UploadedFile() file, @Body() payload) {
+  //   // Process the uploaded file
+  //   console.log('payload:', payload);
+  //   console.log('File:', file);
+  //   return { file, payload };
+  //   // Return response or perform further operations
+  // }
+  // TESTTTTTTTTTTTTT
 
   @Post('/:id/upload-detail-images')
   @Roles(UserType.STAFF)

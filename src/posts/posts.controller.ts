@@ -12,6 +12,7 @@ import {
   Put,
   Param,
   Delete,
+  Patch,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { Roles } from 'src/auth/decorators/roles.decorator';
@@ -21,15 +22,13 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { imageFileFilter } from 'src/validators/validation-file';
 import { diskStorage } from 'multer';
 import { editFileName } from 'src/helpers/file.helper';
-import { CreatePostDto, UpdatePostDto } from './dtos/post.dtos';
+import { CreatePostCategoryDto, CreatePostDto, UpdatePostCategoryDto, UpdatePostDto } from './dtos/post.dtos';
 
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Get()
-  @Roles(UserType.STAFF)
-  @UseGuards(JwtAuthGuard)
   public async getPostList(
     @Query('page', new ParseIntPipe({ optional: true })) page: number = 1,
     @Query('limit', new ParseIntPipe({ optional: true })) limit: number = 10,
@@ -40,6 +39,11 @@ export class PostsController {
       limit,
       data: posts,
     };
+  }
+
+  @Get()
+  public async getPostCategories() {
+    return this.postsService.getPostCategory();
   }
 
   @Get('me')
@@ -114,5 +118,61 @@ export class PostsController {
   public async forceDeletePost(@Param('id') id: number) {
     const result = await this.postsService.forceDeleteOne(id);
     return result;
+  }
+
+  @Patch('/restore/:id')
+  public async restorePost(
+    @Param('id', new ParseIntPipe({ optional: true })) postId: number,
+  ) {
+    return this.postsService.restoreOne(postId);
+  }
+
+  // Post Category
+  @Post()
+  @UseInterceptors(
+    FileInterceptor('thumbnail', {
+      storage: diskStorage({
+        destination: './src/public/images/categories',
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  public async createCategory(
+    @Body() payload: CreatePostCategoryDto,
+    @UploadedFile() thumbnail?: Express.Multer.File,
+  ) {
+    return this.postsService.createOneCategory(payload, thumbnail);
+  }
+
+  @Patch('/restore/:id')
+  public async restoreCategory(
+    // @Param('id') categoryId: number,
+    @Param('id', new ParseIntPipe({ optional: true })) categoryId: number,
+  ) {
+    return this.postsService.restoreOneCategory(categoryId);
+  }
+
+  @Patch(':id')
+  @UseInterceptors(
+    FileInterceptor('thumbnail', {
+      storage: diskStorage({
+        destination: './src/public/images/categories',
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  public async updateCategory(
+    // @Param('id') categoryId: number,
+    @Param('id', new ParseIntPipe({ optional: true })) categoryId: number,
+    @Body() payload: UpdatePostCategoryDto,
+    @UploadedFile() thumbnail?: Express.Multer.File,
+  ) {
+    return this.postsService.updateOneCategory(
+      categoryId,
+      payload,
+      thumbnail,
+    );
   }
 }

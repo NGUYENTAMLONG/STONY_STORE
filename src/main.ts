@@ -2,13 +2,14 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { config } from 'dotenv';
+import { origin } from './configs/cors.config';
 config();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors({
-    origin: ['http://127.0.0.1:5500', 'http://localhost:3001'],
+    origin: origin,
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type', 'Authorization'], // Allow these headers
     exposedHeaders: ['Custom-Header'], // Expose this custom header to JavaScript

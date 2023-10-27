@@ -47,6 +47,8 @@ model User {
   PrivateNotification         PrivateNotification?  @relation(fields: [privateNotificationId], references: [id])
   privateNotificationId       Int?
   sessions                    Session[]             @relation("UserSession")
+  conversationId              Int?
+  Conversation                Conversation?         @relation(fields: [conversationId], references: [id])
 }
 
 model UserSetting {
@@ -117,7 +119,7 @@ model Profile {
   lastName    String
   gender      Gender    @default(UNKNOWN)
   email       String?   @unique
-  phoneNumber String?
+  phoneNumber String?   @unique
   address     String?
   birthday    String?
   biography   String?   @db.Text
@@ -189,9 +191,10 @@ model CartItem {
 
 model Category {
   id           Int           @id @default(autoincrement())
-  name         String
-  nameEN       String?
+  name         String        @unique
+  nameEN       String?       @unique
   description  String?       @db.Text
+  slug         String        @unique
   products     Product[]
   subCategory  SubCategory[]
   introduction String?
@@ -208,8 +211,8 @@ model Category {
 
 model SubCategory {
   id           Int       @id @default(autoincrement())
-  name         String
-  nameEN       String?
+  name         String    @unique
+  nameEN       String?   @unique
   description  String?   @db.Text
   products     Product[]
   categoryId   Int
@@ -249,10 +252,10 @@ model Event {
 }
 
 model Product {
-  id            Int              @id @default(autoincrement())
-  name          String
-  code          String
-  description   String?          @db.Text
+  id            Int                 @id @default(autoincrement())
+  name          String              @unique
+  code          String              @unique
+  description   String?             @db.Text
   importPrice   Float?
   price         Float
   tax           Float?
@@ -262,34 +265,79 @@ model Product {
   thumbnail     String?
   quantity      Int?
   stock         Int?
-  status        ProductStatus    @default(AVAILABLE)
+  slug          String?             @unique
+  brands        BrandsOnProducts[]
+  status        ProductStatus       @default(AVAILABLE)
+  statistical   ProductStatistical?
   categoryId    Int
-  category      Category         @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  category      Category            @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   subCategoryId Int
-  subCategory   SubCategory      @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
-  event         Event?           @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  subCategory   SubCategory         @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
+  event         Event?              @relation(fields: [eventId], references: [id], onDelete: Cascade)
   eventId       Int?
   variants      ProductVariant[]
   images        ProductImage[]
   cartItem      CartItem[]
   reviews       Review[]
   //
-  deletedFlg    Boolean          @default(false)
+  deletedFlg    Boolean             @default(false)
   deletedAt     DateTime?
   createdBy     Int?
-  createdAt     DateTime         @default(now())
+  createdAt     DateTime            @default(now())
   updatedBy     Int?
-  updatedAt     DateTime         @updatedAt
+  updatedAt     DateTime            @updatedAt
   metadata      Json?
   orderItem     OrderItem[]
-  favorite      Favorite?        @relation(fields: [favoriteId], references: [id], onDelete: Cascade)
+  favorite      Favorite?           @relation(fields: [favoriteId], references: [id], onDelete: Cascade)
   favoriteId    Int?
+}
+
+model Brand {
+  id         Int                @id @default(autoincrement())
+  name       String             @unique
+  products   BrandsOnProducts[]
+  deletedFlg Boolean            @default(false)
+  deletedAt  DateTime?
+  createdBy  Int?
+  createdAt  DateTime           @default(now())
+  updatedBy  Int?
+  updatedAt  DateTime           @updatedAt
+  metadata   Json?
+}
+
+model BrandsOnProducts {
+  product    Product  @relation(fields: [productId], references: [id])
+  productId  Int
+  brand      Brand    @relation(fields: [brandId], references: [id])
+  brandId    Int
+  assignedAt DateTime @default(now())
+  assignedBy String
+
+  @@id([productId, brandId])
+}
+
+model ProductStatistical {
+  id            Int       @id @default(autoincrement())
+  views         BigInt    @default(0)
+  purchases     BigInt    @default(0)
+  cancellations BigInt    @default(0)
+  favorites     BigInt    @default(0)
+  productId     Int       @unique
+  product       Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  // 
+  deletedFlg    Boolean   @default(false)
+  deletedAt     DateTime?
+  createdBy     Int?
+  createdAt     DateTime  @default(now())
+  updatedBy     Int?
+  updatedAt     DateTime  @updatedAt
+  metadata      Json?
 }
 
 model Color {
   id          Int              @id @default(autoincrement())
-  name        String
-  nameEN      String?
+  name        String           @unique
+  nameEN      String?          @unique
   description String?          @db.Text
   image       String?
   variants    ProductVariant[]
@@ -304,7 +352,7 @@ model Color {
 
 model Size {
   id          Int              @id @default(autoincrement())
-  name        String
+  name        String           @unique
   description String?          @db.Text
   variants    ProductVariant[]
   metadata    Json?
@@ -318,7 +366,7 @@ model Size {
 
 model Material {
   id          Int              @id @default(autoincrement())
-  name        String
+  name        String           @unique
   description String?          @db.Text
   image       String?
   variants    ProductVariant[]
@@ -371,21 +419,37 @@ model ProductImage {
 }
 
 model Review {
-  id          Int       @id @default(autoincrement())
+  id          Int           @id @default(autoincrement())
   rating      Int // Assuming the rating is an integer value between 1 and 5
   comment     String?
+  images      ReviewImage[]
   productId   Int // Foreign key referencing the Product model
-  product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product     Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
   userId      Int // Foreign key referencing the User model
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  isIncognito Boolean?  @default(false) //avatar,username,email ...
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isIncognito Boolean?      @default(false) //avatar,username,email ...
   metadata    Json?
-  deletedFlg  Boolean   @default(false)
+  deletedFlg  Boolean       @default(false)
   deletedAt   DateTime?
   createdBy   Int?
-  createdAt   DateTime  @default(now())
+  createdAt   DateTime      @default(now())
   updatedBy   Int?
-  updatedAt   DateTime  @updatedAt
+  updatedAt   DateTime      @updatedAt
+}
+
+model ReviewImage {
+  id         Int       @id @default(autoincrement())
+  imageUrl   String
+  orderIndex Int?
+  metadata   Json?
+  deletedFlg Boolean   @default(false)
+  deletedAt  DateTime?
+  createdBy  Int?
+  createdAt  DateTime  @default(now())
+  updatedBy  Int?
+  updatedAt  DateTime  @updatedAt
+  Review     Review?   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  reviewId   Int?
 }
 
 model Order {
@@ -437,7 +501,7 @@ model Voucher {
 
 model Banner {
   id          Int       @id @default(autoincrement())
-  title       String?
+  title       String?   @unique
   description String?   @db.Text
   url         String
   metadata    Json?
@@ -575,8 +639,9 @@ model PrivateNotification {
 
 model PostCategory {
   id           Int                 @id @default(autoincrement())
-  name         String
-  nameEN       String?
+  name         String              @unique
+  nameEN       String?             @unique
+  slug         String?             @unique
   description  String?             @db.Text
   introduction String?
   metadata     Json?
@@ -597,9 +662,10 @@ model Post {
   attachment String?             @db.Text
   thumbnail  String?             @db.Text
   link       String?             @db.Text
+  source     String?             @db.Text
+  slug       String?             @unique
   authorId   Int
   author     User                @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  type       NotificationType    @default(ANOTHER)
   categories CategoriesOnPosts[]
   keywords   PostKeyword[] // Sử dụng bảng liên kết PostKeyword
   metadata   Json?
@@ -624,7 +690,7 @@ model CategoriesOnPosts {
 
 model Keyword {
   id         Int           @id @default(autoincrement())
-  value      String
+  value      String        @unique
   posts      PostKeyword[] // Sử dụng bảng liên kết PostKeyword
   metadata   Json?
   deletedFlg Boolean       @default(false)
@@ -648,6 +714,45 @@ model PostKeyword {
   createdAt  DateTime  @default(now())
   updatedBy  Int?
   updatedAt  DateTime  @updatedAt
+}
+
+model Conversation {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now())
+  messages  Message[]
+  User      User[]
+}
+
+model Message {
+  id             Int            @id @default(autoincrement())
+  content        String?        @db.Text
+  imagesMessage  MessageImage[]
+  // file ??
+  metadata       Json?
+  deletedFlg     Boolean        @default(false)
+  deletedAt      DateTime?
+  createdBy      Int?
+  createdAt      DateTime       @default(now())
+  updatedBy      Int?
+  updatedAt      DateTime       @updatedAt
+  conversation   Conversation   @relation(fields: [conversationId], references: [id])
+  conversationId Int
+}
+
+model MessageImage {
+  id         Int       @id @default(autoincrement())
+  imageUrl   String
+  orderIndex Int?
+  metadata   Json?
+  deletedFlg Boolean   @default(false)
+  deletedAt  DateTime?
+  createdBy  Int?
+  createdAt  DateTime  @default(now())
+  updatedBy  Int?
+  updatedAt  DateTime  @updatedAt
+  Message    Message?  @relation(fields: [messageId], references: [id])
+  messageId  Int?
 }
 
 model Session {

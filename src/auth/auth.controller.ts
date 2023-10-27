@@ -9,6 +9,7 @@ import {
   UnauthorizedException,
   UseGuards,
   Request,
+  Redirect,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dtos/login.dto';
@@ -21,6 +22,7 @@ import {
   RecoverPassworDto,
 } from './dtos/forgot-password.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
+import { origin } from 'src/configs/cors.config';
 
 // @ApiTags('auth')
 // @Controller({ version: ['1'], path: 'auth' })
@@ -45,10 +47,11 @@ export class AuthController {
     return this.authService.verifyJwt(jwtVerify);
   }
   /********************** */
-  // @Get('get-recover-password-form')
-  // async getRecoverPasswordForm(@Param('jwt') jwtVerify: string): Promise<any> {
-  //   // return this.authService.verifyJwt(jwtVerify);
-  // }
+  @Get('get-recover-password-form/:jwt')
+  getRecoverPasswordForm(@Param('jwt') jwtVerify: string, @Res() res): any {
+    const redirectUrl = `${origin[1]}/recover-password?jwt=${jwtVerify}`;
+    res.redirect(redirectUrl);
+  }
   /********************** */
 
   @Post('verify-again')

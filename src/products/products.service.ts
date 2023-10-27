@@ -11,14 +11,29 @@ import { DeleteDetailImagesDto } from './dtos/delete.dtos';
 export class ProductsService {
   constructor(private readonly prisma: PrismaClient) {}
 
-  public async getList(page: number, limit: number): Promise<Product[]> {
+  public async getList(
+    page: number,
+    limit: number,
+    query?: string,
+  ): Promise<any> {
     try {
       const offset = (page - 1) * limit;
-      const products = await this.prisma.product.findMany({
-        skip: offset,
-        take: limit,
-      });
-      return products;
+      const [products, total] = await Promise.all([
+        this.prisma.product.findMany({
+          skip: offset,
+          take: limit,
+          include: {
+            variants: {
+              include: {
+                color: true,
+                material: true,
+              },
+            },
+          },
+        }),
+        this.prisma.product.count(),
+      ]);
+      return { products, total };
     } catch (error) {
       console.log({ productListError: error });
       return error;
@@ -72,6 +87,7 @@ export class ProductsService {
       return error;
     }
   }
+  2;
   public async findVariantOfProduct(
     productId: number,
     variant?: Variant, // : Promise<ProductVariant[]>
@@ -124,6 +140,7 @@ export class ProductsService {
       return error;
     }
   }
+
   public async findFavoriteProducts(customer: User) {
     try {
       return this.prisma.favorite.findMany({

@@ -34,7 +34,6 @@ export class AuthorizationGuard implements CanActivate {
       const request = context.switchToHttp().getRequest();
       const token = context.switchToHttp().getRequest().headers
         .authorization as string;
-      console.log(token);
       const userJwt = this.authService.decode(token);
       if (!userJwt || !token) {
         throw new UnauthorizedException();
@@ -43,7 +42,6 @@ export class AuthorizationGuard implements CanActivate {
       if (userJwt.isAdministrator === true) {
         return true;
       }
-      console.log(token);
       return false;
       // *****************************************
       // const user = await this.userService.accessPermission(

@@ -31,6 +31,8 @@ import { PrismaClient } from '@prisma/client';
 import { UserSettingsModule } from './settings/settings.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { PostsModule } from './posts/posts.module';
+import { ReviewsModule } from './reviews/reviews.module';
+import { SocketModule } from './socket/socket.module';
 
 @Module({
   imports: [
@@ -59,6 +61,8 @@ import { PostsModule } from './posts/posts.module';
     UserSettingsModule,
     NotificationsModule,
     PostsModule,
+    ReviewsModule,
+    SocketModule,
   ],
   controllers: [AppController],
   providers: [
